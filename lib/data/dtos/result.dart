@@ -4,15 +4,22 @@ part 'result.g.dart';
 
 @JsonSerializable()
 class ResultDto {
+
   final int? id;
+
   final String? name;
+
   final String? type;
+
   final String? image;
+
   final List<String>? episode;
+
   final String? url;
+
   final DateTime? created;
 
-  ResultDto({
+  const ResultDto({
     required this.id,
     required this.name,
     required this.type,

@@ -6,6 +6,7 @@ import 'package:test_intern/domain/models/rick_and_morty_model.dart';
 class ApiService {
   static final Dio _dio = Dio();
   static const String _baseUrl = "https://rickandmortyapi.com/api";
+
   Future<RickAndMortyModel> getResult(int page, int count) async {
     try {
       final response =

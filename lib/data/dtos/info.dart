@@ -4,12 +4,16 @@ part 'info.g.dart';
 
 @JsonSerializable()
 class InfoDto {
-  final int count;
-  final int pages;
-  final String next;
-  final dynamic prev;
 
-  InfoDto({
+  final int count;
+
+  final int pages;
+
+  final String? next;
+
+  final String? prev;
+
+ const InfoDto({
     required this.count,
     required this.pages,
     required this.next,
