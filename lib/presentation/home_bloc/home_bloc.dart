@@ -27,7 +27,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
       state.copyWith(
         result: newData.results,
         page: nextPage,
-        next: newData.info!.next ?? '',
+        next: newData.info?.next ?? '',
       ),
     );
   }
