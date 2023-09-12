@@ -22,4 +22,19 @@ class ApiService {
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
   }
+
+  Future<RickAndMortyModel> fetchNameSearch(String name) async {
+    try {
+      final response = await _dio.get("$_baseUrl/character/?name=$name");
+      if (response.statusCode == 200) {
+        final RickMortyCharactersDto dto =
+            RickMortyCharactersDto.fromJson(response.data);
+        final RickAndMortyModel resultModel = dto.toDomain();
+        return resultModel;
+      }
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+    throw Exception('Failed to fetch Rick and Morty names characters.');
+  }
 }
