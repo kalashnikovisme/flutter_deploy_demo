@@ -17,16 +17,18 @@ class ApiService {
   Future<RickAndMortyModel> getResult(int page, int count) async {
     try {
       final response =
-      await _dio.get("$_baseUrl/character/?page=$page&count=$count");
+          await _dio.get("$_baseUrl/character/?page=$page&count=$count");
       if (response.statusCode == 200) {
         final RickMortyCharactersDto dto =
-        RickMortyCharactersDto.fromJson(response.data);
+            RickMortyCharactersDto.fromJson(response.data);
         final RickAndMortyModel resultModel = dto.toDomain();
         return resultModel;
-      } else {
-        errorHandler(response.statusCode.toString());
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.unknown) {
+        errorHandler(e.response?.statusCode.toString() ??
+            'Something went wrong with your internet connection \n Please, find Wi-Fi or mobile connection to continue');
+      }
       throw Exception(e.toString());
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
@@ -37,16 +39,17 @@ class ApiService {
       final response = await _dio.get("$_baseUrl/character/?name=$name");
       if (response.statusCode == 200) {
         final RickMortyCharactersDto dto =
-        RickMortyCharactersDto.fromJson(response.data);
+            RickMortyCharactersDto.fromJson(response.data);
         final RickAndMortyModel resultModel = dto.toDomain();
         return resultModel;
-      } else {
-        errorHandler(response.statusCode.toString());
       }
-    } catch (e) {
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.unknown) {
+        errorHandler(e.response?.statusCode.toString() ??
+            'Something went wrong with your internet connection \n Please, find Wi-Fi or mobile connection to continue');
+      }
       throw Exception(e.toString());
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
   }
 }
-
