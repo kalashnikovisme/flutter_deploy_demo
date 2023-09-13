@@ -13,12 +13,15 @@ class PagState extends Equatable {
 
   final bool isLoading;
 
+  final String search;
+
   const PagState({
     required this.result,
     required this.page,
     required this.count,
     required this.isLoading,
     required this.next,
+    required this.search,
   });
 
   PagState copyWith({
@@ -27,13 +30,16 @@ class PagState extends Equatable {
     int? count,
     bool? isLoading,
     String? next,
+    String? search,
   }) =>
       PagState(
-          result: result ?? this.result,
-          page: page ?? this.page,
-          count: count ?? this.count,
-          isLoading: isLoading ?? this.isLoading,
-          next: next ?? this.next);
+        result: result ?? this.result,
+        page: page ?? this.page,
+        count: count ?? this.count,
+        isLoading: isLoading ?? this.isLoading,
+        search: search ?? this.search,
+        next: next ?? this.next,
+      );
 
   @override
   List<Object?> get props => [result, page, count, isLoading];

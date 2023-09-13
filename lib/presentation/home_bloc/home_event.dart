@@ -25,3 +25,14 @@ class RefreshDataEvent extends PagEvent {
   @override
   List<Object?> get props => [];
 }
+
+class SearchNameEvent extends PagEvent {
+  final String name;
+  SearchNameEvent(this.name);
+  List<Object?> get props => [];
+}
+
+class ClearSearchEven extends PagEvent {
+  @override
+  List<Object?> get props => [];
+}

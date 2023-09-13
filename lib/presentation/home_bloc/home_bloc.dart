@@ -12,12 +12,15 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           count: 20,
           result: [],
           isLoading: false,
+          search: '',
           next: '',
         )) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
     on<UpdateCountEvent>(_onUpdateCount);
     on<RefreshDataEvent>(_onRefreshData);
+    on<SearchNameEvent>(_onSearch);
+    on<ClearSearchEven>(_onClearSearch);
   }
 
   void _onLoadData(LoadListEvent event, Emitter<PagState> emit) async {
@@ -64,6 +67,44 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         result: newData.results,
         page: initialPage,
         count: initialCount,
+      ),
+    );
+  }
+
+  void _onSearch(SearchNameEvent event, Emitter<PagState> emit) async {
+    final localResults = state.result
+        .where((result) => result.name!.contains(event.name.toLowerCase()))
+        .toList();
+
+    if (localResults.isNotEmpty) {
+      emit(state.copyWith(
+          result: localResults, page: 1, isLoading: false, next: ''));
+    } else {
+      final remoteResults = await apiService.fetchNameSearch(event.name);
+      emit(
+        PagState(
+          result: remoteResults.results ?? [],
+          page: 1,
+          count: remoteResults.results?.length ?? 0,
+          isLoading: false,
+          search: event.name,
+          next: '',
+        ),
+      );
+    }
+  }
+
+  void _onClearSearch(ClearSearchEven event, Emitter<PagState> emit) async {
+    const initialPage = 1;
+    final newData = await apiService.getResult(initialPage, state.count);
+    emit(
+      PagState(
+        result: newData.results ?? [],
+        page: 1,
+        count: newData.results?.length ?? 0,
+        isLoading: false,
+        search: '',
+        next: newData.info?.next ?? '',
       ),
     );
   }
