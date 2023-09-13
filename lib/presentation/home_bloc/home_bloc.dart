@@ -4,9 +4,9 @@ import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 
 class HomeBloc extends Bloc<PagEvent, PagState> {
-  final ApiService apiService = ApiService();
+  final ApiService apiService;
 
-  HomeBloc()
+  HomeBloc(this.apiService)
       : super(const PagState(
           page: 1,
           count: 20,
