@@ -19,4 +19,10 @@ class TextsStyles {
     fontSize: 16,
     color: ColorStyle.allDataLoadedColor,
   );
+
+  static const TextStyle connectionErrorString = TextStyle(
+    fontWeight: FontWeight.w900,
+    fontSize: 16,
+    color: ColorStyle.errorImageColor,
+  );
 }
