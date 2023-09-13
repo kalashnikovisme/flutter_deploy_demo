@@ -15,8 +15,6 @@ class PagState extends Equatable {
 
   final String search;
 
-
-
   const PagState({
     required this.result,
     required this.page,
@@ -24,7 +22,6 @@ class PagState extends Equatable {
     required this.isLoading,
     required this.next,
     required this.search,
-
   });
 
   PagState copyWith({
@@ -34,7 +31,6 @@ class PagState extends Equatable {
     bool? isLoading,
     String? next,
     String? search,
-
   }) =>
       PagState(
         result: result ?? this.result,
@@ -43,7 +39,6 @@ class PagState extends Equatable {
         isLoading: isLoading ?? this.isLoading,
         search: search ?? this.search,
         next: next ?? this.next,
-
       );
 
   @override

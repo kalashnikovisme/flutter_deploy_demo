@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TextFieldWidget extends StatelessWidget {
   final TextEditingController controller;
+
   const TextFieldWidget({super.key, required this.controller});
 
   @override
@@ -34,8 +36,8 @@ class TextFieldWidget extends StatelessWidget {
               context.read<HomeBloc>().add(ClearSearchEven());
             },
           ),
-          prefixIcon: Icon(Icons.search),
-          hintText: 'Search Name',
+          prefixIcon: const Icon(Icons.search),
+          hintText: AppLocalizations.of(context)?.searchByName ?? '',
         ),
       ),
     );

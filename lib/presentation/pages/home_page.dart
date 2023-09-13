@@ -5,8 +5,9 @@ import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
+import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -26,7 +27,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: const [
+          LanguageSwitcher(),
+        ],
+      ),
       body: BlocBuilder<HomeBloc, PagState>(
         builder: (context, state) {
           if (!state.isLoading && state.result.isNotEmpty) {
@@ -55,14 +60,13 @@ class _HomePageState extends State<HomePage> {
                           if (index < state.result.length) {
                             return ImageGridWidget(
                               imageUrl: state.result[index].image ?? '',
-                              nameCard: state.result[index].name ??
-                                  'Name is not defined',
+                              nameCard: state.result[index].name ?? '',
                             );
                           }
                           if (state.next.isEmpty) {
-                            return const Center(
+                            return  Center(
                               child: Text(
-                                'All data is loaded',
+                                AppLocalizations.of(context)?.allDataLoadedString ?? '',
                                 style: TextsStyles.allDataLoadedString,
                               ),
                             );
