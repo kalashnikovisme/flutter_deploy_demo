@@ -25,11 +25,7 @@ class ApiService {
         return resultModel;
       }
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.unknown) {
-        errorHandler(e.response?.statusCode.toString() ??
-            'Something went wrong with your internet connection \n Please, find Wi-Fi or mobile connection to continue');
-      }
-      throw Exception(e.toString());
+      errorHandler(e.response?.statusCode.toString() ?? '');
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
   }
@@ -44,11 +40,7 @@ class ApiService {
         return resultModel;
       }
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.unknown) {
-        errorHandler(e.response?.statusCode.toString() ??
-            'Something went wrong with your internet connection \n Please, find Wi-Fi or mobile connection to continue');
-      }
-      throw Exception(e.toString());
+      errorHandler(e.response?.statusCode.toString() ?? '');
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
   }
