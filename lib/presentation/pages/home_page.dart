@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/text_styles.dart';
+import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
+import 'package:test_intern/presentation/error_bloc/error_state.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
+import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
 import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -32,60 +36,70 @@ class _HomePageState extends State<HomePage> {
           LanguageSwitcher(),
         ],
       ),
-      body: BlocBuilder<HomeBloc, PagState>(
-        builder: (context, state) {
-          if (!state.isLoading && state.result.isNotEmpty) {
-            return NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification is ScrollEndNotification &&
-                    _scrollController.position.extentAfter == 0) {
-                  context.read<HomeBloc>().add(LoadNextPageEvent());
-                }
-                return false;
-              },
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  context.read<HomeBloc>().add(RefreshDataEvent());
-                },
-                child: Column(
-                  children: [
-                    TextFieldWidget(
-                      controller: controller,
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        controller: _scrollController,
-                        itemCount: state.result.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index < state.result.length) {
-                            return ImageGridWidget(
-                              imageUrl: state.result[index].image ?? '',
-                              nameCard: state.result[index].name ?? '',
-                            );
-                          }
-                          if (state.next.isEmpty) {
-                            return  Center(
-                              child: Text(
-                                AppLocalizations.of(context)?.allDataLoadedString ?? '',
-                                style: TextsStyles.allDataLoadedString,
+      body: BlocBuilder<ErrorBloc, ErrorState>(
+        builder: (context, errorState) {
+          if (errorState is ShowErrorState) {
+            return ErrorTextWidget(
+              message: errorState.message,
+            );
+          } else {
+            return BlocBuilder<HomeBloc, PagState>(
+              builder: (context, state) {
+                if (!state.isLoading && state.result.isNotEmpty) {
+                  return NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification is ScrollEndNotification &&
+                          _scrollController.position.extentAfter == 0) {
+                        context.read<HomeBloc>().add(LoadNextPageEvent());
+                      }
+                      return false;
+                    },
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        context.read<HomeBloc>().add(RefreshDataEvent());
+                      },
+                      child: Column(
+                        children: [
+                          TextFieldWidget(
+                            controller: controller,
+                          ),
+                          Expanded(
+                            child: GridView.builder(
+                              controller: _scrollController,
+                              itemCount: state.result.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index < state.result.length) {
+                                  return ImageGridWidget(
+                                    imageUrl: state.result[index].image ?? '',
+                                    nameCard: state.result[index].name ?? '',
+                                  );
+                                }
+                                if (state.next.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                      AppLocalizations.of(context)?.allDataLoadedString ?? '',
+                                      style: TextsStyles.allDataLoadedString,
+                                    ),
+                                  );
+                                }
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              },
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
                               ),
-                            );
-                          }
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        },
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
             );
           }
-          return const Center(child: CircularProgressIndicator());
         },
       ),
     );

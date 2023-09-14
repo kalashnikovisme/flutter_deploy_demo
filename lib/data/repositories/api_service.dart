@@ -1,11 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:test_intern/data/dtos/rick_and_morty.dart';
 import 'package:test_intern/data/mappers/rick_and_morty_mapper.dart';
+import 'package:test_intern/data/repositories/interceptors/error_interceptor.dart';
 import 'package:test_intern/domain/models/rick_and_morty_model.dart';
 
 class ApiService {
   static final Dio _dio = Dio();
   static const String _baseUrl = "https://rickandmortyapi.com/api";
+
+  final Function(String) errorHandler;
+
+  ApiService({required this.errorHandler}) {
+    _dio.interceptors.addAll([ErrorInterceptor(errorHandler)]);
+  }
 
   Future<RickAndMortyModel> getResult(int page, int count) async {
     try {
@@ -18,7 +25,7 @@ class ApiService {
         return resultModel;
       }
     } on DioException catch (e) {
-      throw Exception(e.toString());
+      errorHandler(e.response?.statusCode.toString() ?? '');
     }
     throw Exception('Failed to fetch Rick and Morty characters.');
   }
@@ -32,9 +39,9 @@ class ApiService {
         final RickAndMortyModel resultModel = dto.toDomain();
         return resultModel;
       }
-    } catch (e) {
-      throw Exception(e.toString());
+    } on DioException catch (e) {
+      errorHandler(e.response?.statusCode.toString() ?? '');
     }
-    throw Exception('Failed to fetch Rick and Morty names characters.');
+    throw Exception('Failed to fetch Rick and Morty characters.');
   }
 }
