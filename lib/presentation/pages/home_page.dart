@@ -17,6 +17,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
+
   const HomePage({Key? key, required this.email}) : super(key: key);
 
   @override
@@ -26,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController controller = TextEditingController();
+
   @override
   void initState() {
     BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
@@ -89,7 +91,8 @@ class _HomePageState extends State<HomePage> {
                                   );
                                 }
                                 return const Center(
-                                    child: CircularProgressIndicator());
+                                  child: CircularProgressIndicator(),
+                                );
                               },
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -109,17 +112,18 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            context.read<AuthBloc>().add(SignOutEvent());
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const RegistrationScreen(),
-              ),
-              (route) => false,
-            );
-          },
-          label: const Text('Sign out')),
+        onPressed: () {
+          context.read<AuthBloc>().add(SignOutEvent());
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RegistrationScreen(),
+            ),
+            (route) => false,
+          );
+        },
+        label: const Text('Sign out'),
+      ),
     );
   }
 }

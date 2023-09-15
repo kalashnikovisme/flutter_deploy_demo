@@ -17,6 +17,7 @@ class AuthUnauthenticated extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthErrorState extends AuthState {
-  String errorMeasage;
-  AuthErrorState(this.errorMeasage);
+  final String errorMessage;
+
+  AuthErrorState(this.errorMessage);
 }

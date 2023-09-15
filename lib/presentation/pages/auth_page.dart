@@ -29,23 +29,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthErrorState) {
-              if (state.errorMeasage.contains('email')) {
-                emailErrorText = state.errorMeasage;
+              if (state.errorMessage.contains('email')) {
+                emailErrorText = state.errorMessage;
                 passwordErrorText = '';
               } else {
-                passwordErrorText = state.errorMeasage;
+                passwordErrorText = state.errorMessage;
                 emailErrorText = '';
               }
             } else if (state is AuthAuthenticated) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(
-                      email: state.user.email ?? '',
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(
+                        email: state.user.email ?? '',
+                      ),
                     ),
-                  ),
-                );
-              });
+                  );
+                },
+              );
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -80,7 +82,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                RegisterEvent(email: email, password: password),
+                                RegisterEvent(
+                                  email: email,
+                                  password: password,
+                                ),
                               );
                         },
                         child: const Text('Зарегистрироваться'),
@@ -90,7 +95,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                SignInEvent(email: email, password: password),
+                                SignInEvent(
+                                  email: email,
+                                  password: password,
+                                ),
                               );
                         },
                         child: const Text('Войти'),
