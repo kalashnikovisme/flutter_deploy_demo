@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/text_styles.dart';
+import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
+import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_state.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
+import 'package:test_intern/presentation/pages/auth_page.dart';
 import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
 import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
@@ -13,7 +16,9 @@ import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String email;
+
+  const HomePage({Key? key, required this.email}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController controller = TextEditingController();
+
   @override
   void initState() {
     BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
@@ -77,13 +83,16 @@ class _HomePageState extends State<HomePage> {
                                 if (state.next.isEmpty) {
                                   return Center(
                                     child: Text(
-                                      AppLocalizations.of(context)?.allDataLoadedString ?? '',
+                                      AppLocalizations.of(context)
+                                              ?.allDataLoadedString ??
+                                          '',
                                       style: TextsStyles.allDataLoadedString,
                                     ),
                                   );
                                 }
                                 return const Center(
-                                    child: CircularProgressIndicator());
+                                  child: CircularProgressIndicator(),
+                                );
                               },
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -101,6 +110,19 @@ class _HomePageState extends State<HomePage> {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.read<AuthBloc>().add(SignOutEvent());
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RegistrationScreen(),
+            ),
+            (route) => false,
+          );
+        },
+        label: const Text('Sign out'),
       ),
     );
   }

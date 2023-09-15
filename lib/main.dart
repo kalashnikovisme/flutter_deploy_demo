@@ -1,16 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
 import 'package:test_intern/l10n/l10n.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
-import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_state.dart';
-import 'package:test_intern/presentation/pages/home_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:test_intern/root_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -47,10 +49,7 @@ class MyApp extends StatelessWidget {
                         );
                   },
                 ),
-                child: BlocProvider<HomeBloc>(
-                  create: (context) => HomeBloc(context.read<ApiService>()),
-                  child: const HomePage(),
-                ),
+                child: const RootScreen(),
               ),
             ),
           );

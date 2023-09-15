@@ -9,4 +9,5 @@ class ColorStyle{
   static const Color allDataLoadedColor = Color(0xFF88E23B);
   static const Color enabledSearchBorderColor = Color(0xFF60A85F);
   static const Color focusedSearchBorderColor = Color(0xFF88E23B);
+  static const Color errorAuthColor =  Color(0xFFFF5454);
 }
