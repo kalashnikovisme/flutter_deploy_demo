@@ -9,7 +9,6 @@ import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FireBaseService fireBaseService = FireBaseService();
   SQLService sQlService = SQLService();
-  final AuthErrorHandling errorHandling = AuthErrorHandling();
   final _emailRules = RegExp(
       r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$');
 
@@ -33,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user!));
       }
     } on FirebaseAuthException catch (e) {
-      emit(AuthErrorState(errorHandling.handleFirebaseAuthException(e)));
+      emit(AuthErrorState(e.getErrorMessage()));
     }
   }
 
@@ -47,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user!));
       }
     } on FirebaseAuthException catch (e) {
-      emit(AuthErrorState(errorHandling.handleFirebaseAuthException(e)));
+      emit(AuthErrorState(e.getErrorMessage()));
     }
   }
 
