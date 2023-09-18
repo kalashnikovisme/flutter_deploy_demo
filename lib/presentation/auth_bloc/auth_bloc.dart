@@ -28,7 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        emit(CheckAuth(null, false));
+        emit(const CheckAuth(null, false));
       } else {
         final tokenExists = await sQlService.isTokenExist();
         emit(CheckAuth(user, tokenExists));
@@ -41,16 +41,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _registerUser(RegisterEvent event, Emitter<AuthState> emit) async {
     try {
       if (_isEmailAndPasswordEmpty(event.email, event.password)) {
-        emit(AuthErrorState("Email and password are required."));
+        emit(const AuthErrorState("Email and password are required."));
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.registerUser(event.email, event.password);
-        if (user != null) {
-          final String? token = await user.getIdToken();
+        final _user = user;
+        if (_user != null) {
+          final String? token = await _user.getIdToken();
           await sQlService.saveToken(token ?? '');
-          emit(AuthAuthenticated(user));
+          emit(AuthAuthenticated(_user));
         } else {
-          emit(AuthAuthenticated(user!));
+          emit(const AuthErrorState("User registration failed."));
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -61,7 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _signIn(SignInEvent event, Emitter<AuthState> emit) async {
     try {
       if (_isEmailAndPasswordEmpty(event.email, event.password)) {
-        emit(AuthErrorState("Email and password are required."));
+        emit(const AuthErrorState("Email and password are required."));
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.signInUser(event.email, event.password);
