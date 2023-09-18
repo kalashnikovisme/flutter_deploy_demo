@@ -16,9 +16,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_registerUser);
     on<SignInEvent>(_signIn);
     on<SignOutEvent>(_signOut);
+    on<CheckAuthorizationEvent>(_checkAuthorization);
   }
+
   bool _isEmailAndPasswordEmpty(String email, String password) {
     return email.isEmpty || password.isEmpty;
+  }
+
+  void _checkAuthorization(
+      CheckAuthorizationEvent event, Emitter<AuthState> emit) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        emit(CheckAuth(null, false));
+      } else {
+        final tokenExists = await sQlService.isTokenExist();
+        emit(CheckAuth(user, tokenExists));
+      }
+    } on FirebaseAuthException catch (e) {
+      emit(AuthErrorState(e.getErrorMessage()));
+    }
   }
 
   void _registerUser(RegisterEvent event, Emitter<AuthState> emit) async {
@@ -31,8 +48,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user != null) {
           final String? token = await user.getIdToken();
           await sQlService.saveToken(token ?? '');
+          emit(AuthAuthenticated(user));
+        } else {
+          emit(AuthAuthenticated(user!));
         }
-        emit(AuthAuthenticated(user!));
       }
     } on FirebaseAuthException catch (e) {
       emit(AuthErrorState(e.getErrorMessage()));
