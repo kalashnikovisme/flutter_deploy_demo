@@ -4,6 +4,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -39,12 +40,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             } else if (state is AuthAuthenticated) {
               WidgetsBinding.instance.addPostFrameCallback(
                 (_) {
-                  Navigator.of(context).push(
+                  Navigator.pushAndRemoveUntil(
+                    context,
                     MaterialPageRoute(
-                      builder: (context) => HomePage(
-                        email: state.user.email ?? '',
-                      ),
+                      builder: (context) =>
+                          HomePage(email: state.user.email ?? ''),
                     ),
+                    (route) => false,
                   );
                 },
               );
@@ -88,7 +90,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 ),
                               );
                         },
-                        child: const Text('Зарегистрироваться'),
+                        child: Text(
+                          AppLocalizations.of(context)?.registerString ?? '',
+                        ),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -101,7 +105,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 ),
                               );
                         },
-                        child: const Text('Войти'),
+                        child: Text(
+                          AppLocalizations.of(context)?.signInString ?? '',
+                        ),
                       ),
                     ],
                   ),

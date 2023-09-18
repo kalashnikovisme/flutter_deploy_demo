@@ -16,20 +16,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_registerUser);
     on<SignInEvent>(_signIn);
     on<SignOutEvent>(_signOut);
+    on<CheckAuthorizationEvent>(_checkAuthorization);
   }
+
   bool _isEmailAndPasswordEmpty(String email, String password) {
     return email.isEmpty || password.isEmpty;
+  }
+
+  void _checkAuthorization(
+      CheckAuthorizationEvent event, Emitter<AuthState> emit) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        emit(const CheckAuth(null, false));
+      } else {
+        final tokenExists = await sQlService.isTokenExist();
+        emit(CheckAuth(user, tokenExists));
+      }
+    } on FirebaseAuthException catch (e) {
+      emit(AuthErrorState(e.getErrorMessage()));
+    }
   }
 
   void _registerUser(RegisterEvent event, Emitter<AuthState> emit) async {
     try {
       if (_isEmailAndPasswordEmpty(event.email, event.password)) {
-        emit(AuthErrorState("Email and password are required."));
+        emit(const AuthErrorState("Email and password are required."));
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.registerUser(event.email, event.password);
-        await sQlService.saveToken(user?.uid ?? '');
-        emit(AuthAuthenticated(user!));
+        final _user = user;
+        if (_user != null) {
+          final String? token = await _user.getIdToken();
+          await sQlService.saveToken(token ?? '');
+          emit(AuthAuthenticated(_user));
+        } else {
+          emit(const AuthErrorState("User registration failed."));
+        }
       }
     } on FirebaseAuthException catch (e) {
       emit(AuthErrorState(e.getErrorMessage()));
@@ -39,7 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _signIn(SignInEvent event, Emitter<AuthState> emit) async {
     try {
       if (_isEmailAndPasswordEmpty(event.email, event.password)) {
-        emit(AuthErrorState("Email and password are required."));
+        emit(const AuthErrorState("Email and password are required."));
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.signInUser(event.email, event.password);

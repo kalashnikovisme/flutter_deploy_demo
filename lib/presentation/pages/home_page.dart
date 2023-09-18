@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
@@ -113,17 +114,55 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          context.read<AuthBloc>().add(SignOutEvent());
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const RegistrationScreen(),
-            ),
-            (route) => false,
-          );
+          _showExitDialog(context);
         },
-        label: const Text('Sign out'),
+        label: Text(
+          AppLocalizations.of(context)?.exitButtonString ?? '',
+        ),
       ),
+    );
+  }
+
+  Future<void> _showExitDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: ColorStyle.modalSheetColor,
+          title: Text(
+            AppLocalizations.of(context)?.exitModalString ?? '',
+            style: TextsStyles.modalSheet,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                AppLocalizations.of(context)?.no ?? '',
+                style: TextsStyles.modalSheet,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<AuthBloc>().add(SignOutEvent());
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RegistrationScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              child: Text(
+                AppLocalizations.of(context)?.yes ?? '',
+                style: TextsStyles.modalSheet,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

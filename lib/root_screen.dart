@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
@@ -5,10 +6,13 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
-import 'package:test_intern/presentation/pages/auth_page.dart';
+import 'package:test_intern/presentation/pages/home_page.dart';
 
 class RootScreen extends StatelessWidget {
-  const RootScreen({super.key});
+
+  RootScreen({super.key});
+
+  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +44,7 @@ class RootScreen extends StatelessWidget {
             WidgetBuilder builder;
             switch (settings.name) {
               default:
-                builder = (BuildContext _) => const RegistrationScreen();
+                builder = (BuildContext _) => HomePage(email: userEmail);
             }
             return MaterialPageRoute(builder: builder, settings: settings);
           },
