@@ -25,4 +25,10 @@ class TextsStyles {
     fontSize: 16,
     color: ColorStyle.errorImageColor,
   );
+  static const TextStyle modalSheet = TextStyle(
+    fontWeight: FontWeight.w900,
+    fontSize: 16,
+    color: ColorStyle.nameCardColor,
+  );
+
 }

@@ -26,9 +26,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (_isEmailAndPasswordEmpty(event.email, event.password)) {
         emit(AuthErrorState("Email and password are required."));
       } else if (_emailRules.hasMatch(event.email)) {
-        final user =
+        var user =
             await fireBaseService.registerUser(event.email, event.password);
-        await sQlService.saveToken(user?.uid ?? '');
+         user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          String? token = await user.getIdToken();
+          await sQlService.saveToken(token ?? '');
+        }
         emit(AuthAuthenticated(user!));
       }
     } on FirebaseAuthException catch (e) {

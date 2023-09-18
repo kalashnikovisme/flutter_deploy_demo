@@ -1,5 +1,12 @@
 {
   "errorImageString": "Изображение не загрузилось",
   "allDataLoadedString": "Все данные загружены",
-  "searchByName": "Искать по имени"
+  "searchByName": "Искать по имени",
+  "exitButtonString": "Выход",
+  "exitModalString": "Хотите выйти?",
+  "yes":"Да",
+  "no": "Нет",
+  "registerString": "Зарегистрироваться",
+  "signInString": "Войти",
+  "passwordString": "Пароль"
 }

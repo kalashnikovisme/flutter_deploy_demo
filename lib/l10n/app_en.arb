@@ -1,5 +1,12 @@
 {
   "errorImageString": "Image has not been loaded",
   "allDataLoadedString": "All data are loaded",
-  "searchByName": "Search by name"
+  "searchByName": "Search by name",
+  "exitButtonString": "Sign out",
+  "exitModalString": "Do you want to sign out?",
+  "yes":"Yes",
+  "no": "No",
+  "registerString": "Sign up",
+  "signInString": "Sign in",
+  "passwordString": "Password"
 }
