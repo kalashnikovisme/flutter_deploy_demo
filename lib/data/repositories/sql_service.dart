@@ -5,7 +5,12 @@ class SQLService {
   Database? _db;
 
   Future<Database?> get db async {
-    _db ??= await _initDB();
+    if (_db == null) {
+      _db = await _initDB();
+      if (_db == null) {
+        throw Exception("Database is null");
+      }
+    }
     return _db;
   }
 
