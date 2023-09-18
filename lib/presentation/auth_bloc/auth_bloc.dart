@@ -28,9 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (_emailRules.hasMatch(event.email)) {
         var user =
             await fireBaseService.registerUser(event.email, event.password);
-         user = FirebaseAuth.instance.currentUser;
         if (user != null) {
-          String? token = await user.getIdToken();
+          final String? token = await user.getIdToken();
           await sQlService.saveToken(token ?? '');
         }
         emit(AuthAuthenticated(user!));

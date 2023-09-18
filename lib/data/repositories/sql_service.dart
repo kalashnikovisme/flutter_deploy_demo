@@ -10,8 +10,8 @@ class SQLService {
   }
 
   Future<Database> _initDB() async {
-    String dbPath = join(await getDatabasesPath(), "user_database.db");
-    var charDB = await openDatabase(dbPath, version: 1, onCreate: _createDB);
+    final String dbPath = join(await getDatabasesPath(), "user_database.db");
+    final charDB = await openDatabase(dbPath, version: 1, onCreate: _createDB);
     return charDB;
   }
 
@@ -23,24 +23,15 @@ class SQLService {
 
   Future<void> saveToken(String token) async {
     final db = await this.db;
-    if (db != null) {
-      await db.rawInsert(
-        'INSERT INTO User (firebaseToken) VALUES(?)',
-        [token],
-      );
-    } else {
-
-      throw Exception("Database is null");
-    }
+    await db?.rawInsert(
+      'INSERT INTO User (firebaseToken) VALUES(?)',
+      [token],
+    );
   }
 
   Future<bool> isTokenExist() async {
     final db = await this.db;
-    if (db != null) {
-      final result = await db.rawQuery('SELECT COUNT(*) FROM User');
-      return Sqflite.firstIntValue(result) == 1;
-    } else {
-      throw Exception("Database is null");
-    }
+    final result = await db?.rawQuery('SELECT COUNT(*) FROM User');
+    return Sqflite.firstIntValue(result ?? []) == 1;
   }
 }
