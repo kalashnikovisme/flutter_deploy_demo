@@ -1,16 +1,14 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
 
-abstract class PagEvent extends Equatable {}
-
-class LoadListEvent extends PagEvent {
+abstract class PagEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
 
-class LoadNextPageEvent extends PagEvent {
-  @override
-  List<Object?> get props => [];
-}
+class LoadListEvent extends PagEvent {}
+
+class LoadNextPageEvent extends PagEvent {}
 
 class UpdateCountEvent extends PagEvent {
   final int newCount;
@@ -21,18 +19,21 @@ class UpdateCountEvent extends PagEvent {
   List<Object?> get props => [newCount];
 }
 
-class RefreshDataEvent extends PagEvent {
-  @override
-  List<Object?> get props => [];
-}
+class RefreshDataEvent extends PagEvent {}
 
 class SearchNameEvent extends PagEvent {
   final String name;
+
   SearchNameEvent(this.name);
-  List<Object?> get props => [];
+
+  @override
+  List<Object?> get props => [name];
 }
 
-class ClearSearchEven extends PagEvent {
-  @override
-  List<Object?> get props => [];
+class ClearSearchEvent extends PagEvent {}
+
+class NoInternetEvent extends PagEvent{
+  final ConnectivityResult result;
+  NoInternetEvent(this.result);
 }
+

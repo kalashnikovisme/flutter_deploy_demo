@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
@@ -31,7 +32,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+      BlocProvider.of<HomeBloc>(context).add(NoInternetEvent(result));
+    });
     super.initState();
   }
 
@@ -91,6 +95,26 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   );
                                 }
+                                if (state.isCached) {
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                    (_) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: state.isCached
+                                              ? Colors.green
+                                              : Colors.red,
+                                          content: state.isCached
+                                              ? const Text(
+                                                  'data loaded from cache')
+                                              : const Text(
+                                                  'Data loaded from internet'),
+                                          duration: const Duration(seconds: 3),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
                                 return const Center(
                                   child: CircularProgressIndicator(),
                                 );
@@ -106,7 +130,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 }
-                return const Center(child: CircularProgressIndicator());
+                return state.connection
+                    ? const Center(
+                        child: CircularProgressIndicator()
+                      )
+                    : const Center(
+                        child: Text('Not Available'),
+                      );
               },
             );
           }
