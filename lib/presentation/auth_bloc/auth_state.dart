@@ -28,4 +28,3 @@ class AuthErrorState extends AuthState {
 
   const AuthErrorState(this.errorMessage);
 }
-

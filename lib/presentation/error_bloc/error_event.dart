@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-abstract class ErrorEvent extends Equatable {
+class ErrorEvent extends Equatable {
   const ErrorEvent();
+  @override
+  List<Object?> get props => throw UnimplementedError();
 }
 
 class ShowErrorEvent extends ErrorEvent {
@@ -12,3 +14,5 @@ class ShowErrorEvent extends ErrorEvent {
   @override
   List<Object?> get props => [message];
 }
+
+class ClearErrorEvent extends ErrorEvent {}

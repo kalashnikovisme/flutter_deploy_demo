@@ -1,10 +1,16 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
+import 'package:test_intern/data/repositories/sql_service.dart';
+import 'package:test_intern/domain/models/result_model.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 
 class HomeBloc extends Bloc<PagEvent, PagState> {
   final ApiService apiService;
+  final SQLService service = SQLService();
 
   HomeBloc(this.apiService)
       : super(const PagState(
@@ -14,25 +20,42 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           isLoading: false,
           search: '',
           next: '',
+          isCached: false,
+          connection: false,
         )) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
     on<UpdateCountEvent>(_onUpdateCount);
     on<RefreshDataEvent>(_onRefreshData);
     on<SearchNameEvent>(_onSearch);
-    on<ClearSearchEven>(_onClearSearch);
+    on<ClearSearchEvent>(_onClearSearch);
+  }
+  Future<bool> isInternetAvailable() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
   }
 
   void _onLoadData(LoadListEvent event, Emitter<PagState> emit) async {
-    const nextPage = 1;
-    final newData = await apiService.getResult(nextPage, state.count);
-    emit(
-      state.copyWith(
-        result: newData.results,
-        page: nextPage,
-        next: newData.info?.next ?? '',
-      ),
-    );
+    final bool isInternetConnected = await isInternetAvailable();
+    List<ResultModel> data = [];
+    if (isInternetConnected) {
+      const nextPage = 1;
+      final newData = await apiService.getResult(nextPage, state.count);
+      await service.insertPaginatedList(newData.results);
+      data = newData.results ?? [];
+      emit(state.copyWith(
+          connection: true, result: newData.results, page: nextPage));
+    } else {
+      final cachedData = await service.getCachedList();
+      if (cachedData?.isNotEmpty ?? false) {
+        data = cachedData ?? [];
+      } else {
+        data = [];
+      }
+    }
+    bool isCached =
+        !isInternetConnected || (data.isNotEmpty && !isInternetConnected);
+    emit(state.copyWith(result: data, page: state.page, isCached: isCached));
   }
 
   void _onLoadNextPage(LoadNextPageEvent event, Emitter<PagState> emit) async {
@@ -72,29 +95,34 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
   }
 
   void _onSearch(SearchNameEvent event, Emitter<PagState> emit) async {
-    final localResults = state.result
-        .where((result) => result.name!.contains(event.name.toLowerCase()))
-        .toList();
-
-    if (localResults.isNotEmpty) {
-      emit(state.copyWith(
-          result: localResults, page: 1, isLoading: false, next: ''));
-    } else {
-      final remoteResults = await apiService.fetchNameSearch(event.name);
-      emit(
-        PagState(
-          result: remoteResults.results ?? [],
-          page: 1,
-          count: remoteResults.results?.length ?? 0,
-          isLoading: false,
-          search: event.name,
-          next: '',
-        ),
-      );
+    final localResults = await service.getCachedList();
+    if (localResults != null) {
+      final filteredLocalResults = localResults
+          .where((result) =>
+              result.name!.toLowerCase().contains(event.name.toLowerCase()))
+          .toList();
+      if (filteredLocalResults.isNotEmpty) {
+        emit(state.copyWith(
+            result: filteredLocalResults, page: 1, isLoading: false, next: ''));
+        return;
+      }
     }
+    final remoteResults = await apiService.fetchNameSearch(event.name);
+    emit(
+      PagState(
+        result: remoteResults.results ?? [],
+        page: 1,
+        count: remoteResults.results?.length ?? 0,
+        isLoading: false,
+        search: event.name,
+        next: '',
+        isCached: false,
+        connection: false,
+      ),
+    );
   }
 
-  void _onClearSearch(ClearSearchEven event, Emitter<PagState> emit) async {
+  void _onClearSearch(ClearSearchEvent event, Emitter<PagState> emit) async {
     const initialPage = 1;
     final newData = await apiService.getResult(initialPage, state.count);
     emit(
@@ -105,6 +133,8 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         isLoading: false,
         search: '',
         next: newData.info?.next ?? '',
+        isCached: false,
+        connection: false,
       ),
     );
   }

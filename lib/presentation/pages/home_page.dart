@@ -1,10 +1,13 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
+import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
+import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/error_bloc/error_state.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
@@ -31,8 +34,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
     super.initState();
+    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+    final connectionCubit = context.read<ConnectionCubit>();
+    connectionCubit.stream.listen((connectionState) {
+      if (connectionState.result == ConnectivityResult.mobile ||
+          connectionState.result == ConnectivityResult.wifi ||
+          connectionState.result == ConnectivityResult.none) {
+        BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
+        BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+      }
+    });
   }
 
   @override

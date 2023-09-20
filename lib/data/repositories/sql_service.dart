@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:test_intern/domain/models/result_model.dart';
 
 class SQLService {
   Database? _db;
@@ -22,8 +23,42 @@ class SQLService {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE User (id INTEGER PRIMARY KEY, firebaseToken TEXT)
+      CREATE TABLE User (id INTEGER PRIMARY KEY AUTOINCREMENT, firebaseToken TEXT)
     ''');
+    await db.execute('''
+    CREATE TABLE characters (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      image BLOB 
+    )
+  ''');
+  }
+
+  Future<void> insertPaginatedList(List<ResultModel>? character) async {
+    final db = await this.db;
+    for (final char in character ?? []) {
+      await db?.insert(
+        'characters',
+        {
+          'id': char.id,
+          'name': char.name,
+          'image': char.image,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  Future<List<ResultModel>?> getCachedList() async {
+    final db = await this.db;
+    var result = await db?.query("characters");
+    return result?.map((map) {
+      return ResultModel(
+        id: map['id'] as int,
+        name: map['name'] as String,
+        image: map['image'] as String,
+      );
+    }).toList();
   }
 
   Future<void> saveToken(String token) async {

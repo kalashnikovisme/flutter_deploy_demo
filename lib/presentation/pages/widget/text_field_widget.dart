@@ -33,7 +33,7 @@ class TextFieldWidget extends StatelessWidget {
             icon: const Icon(Icons.clear),
             onPressed: () {
               controller.clear();
-              context.read<HomeBloc>().add(ClearSearchEven());
+              context.read<HomeBloc>().add(ClearSearchEvent());
             },
           ),
           prefixIcon: const Icon(Icons.search),

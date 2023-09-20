@@ -45,11 +45,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.registerUser(event.email, event.password);
-        final _user = user;
-        if (_user != null) {
-          final String? token = await _user.getIdToken();
+        if (user != null) {
+          final String? token = await user.getIdToken();
           await sQlService.saveToken(token ?? '');
-          emit(AuthAuthenticated(_user));
+          emit(AuthAuthenticated(user));
         } else {
           emit(const AuthErrorState("User registration failed."));
         }
