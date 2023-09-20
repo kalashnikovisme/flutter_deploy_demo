@@ -13,3 +13,5 @@ class ShowErrorState extends ErrorState {
   @override
   List<Object?> get props => [message];
 }
+
+class ClearErrorState extends ErrorState {}

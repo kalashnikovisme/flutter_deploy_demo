@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:test_intern/domain/models/result_model.dart';
 
 class PagState extends Equatable {
-
   final List<ResultModel> result;
 
   final int page;
@@ -18,6 +17,7 @@ class PagState extends Equatable {
   final bool isCached;
 
   final bool connection;
+
   const PagState({
     required this.result,
     required this.page,
@@ -47,7 +47,7 @@ class PagState extends Equatable {
         search: search ?? this.search,
         next: next ?? this.next,
         isCached: isCached ?? this.isCached,
-        connection: connection ?? this.connection
+        connection: connection ?? this.connection,
       );
 
   @override

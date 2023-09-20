@@ -1,5 +1,3 @@
-
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:test_intern/domain/models/result_model.dart';
@@ -38,7 +36,7 @@ class SQLService {
 
   Future<void> insertPaginatedList(List<ResultModel>? character) async {
     final db = await this.db;
-    for (final char in character ?? []){
+    for (final char in character ?? []) {
       await db?.insert(
         'characters',
         {

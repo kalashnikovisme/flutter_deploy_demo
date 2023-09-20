@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
 import 'package:test_intern/l10n/l10n.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
+import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(context.read<ApiService>()),
+          ),
+          BlocProvider(
+            create: (context) => ConnectionCubit(),
           ),
           BlocProvider<ErrorBloc>(
             lazy: false,

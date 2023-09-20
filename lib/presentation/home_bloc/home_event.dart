@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class PagEvent extends Equatable {
@@ -31,9 +30,3 @@ class SearchNameEvent extends PagEvent {
 }
 
 class ClearSearchEvent extends PagEvent {}
-
-class NoInternetEvent extends PagEvent{
-  final ConnectivityResult result;
-  NoInternetEvent(this.result);
-}
-

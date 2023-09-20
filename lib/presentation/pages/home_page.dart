@@ -5,7 +5,9 @@ import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
+import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
+import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/error_bloc/error_state.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
@@ -32,11 +34,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
-      BlocProvider.of<HomeBloc>(context).add(NoInternetEvent(result));
-    });
     super.initState();
+    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+    final connectionCubit = context.read<ConnectionCubit>();
+    connectionCubit.stream.listen((connectionState) {
+      if (connectionState.result == ConnectivityResult.mobile ||
+          connectionState.result == ConnectivityResult.wifi ||
+          connectionState.result == ConnectivityResult.none) {
+        BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
+        BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+      }
+    });
   }
 
   @override
@@ -95,26 +103,6 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   );
                                 }
-                                if (state.isCached) {
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                    (_) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: state.isCached
-                                              ? Colors.green
-                                              : Colors.red,
-                                          content: state.isCached
-                                              ? const Text(
-                                                  'data loaded from cache')
-                                              : const Text(
-                                                  'Data loaded from internet'),
-                                          duration: const Duration(seconds: 3),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }
                                 return const Center(
                                   child: CircularProgressIndicator(),
                                 );
@@ -130,13 +118,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 }
-                return state.connection
-                    ? const Center(
-                        child: CircularProgressIndicator()
-                      )
-                    : const Center(
-                        child: Text('Not Available'),
-                      );
+                return const Center(child: CircularProgressIndicator());
               },
             );
           }

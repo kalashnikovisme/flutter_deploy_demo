@@ -21,7 +21,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           search: '',
           next: '',
           isCached: false,
-          connection: false
+          connection: false,
         )) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
@@ -29,19 +29,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     on<RefreshDataEvent>(_onRefreshData);
     on<SearchNameEvent>(_onSearch);
     on<ClearSearchEvent>(_onClearSearch);
-    on<NoInternetEvent>(_checkConnection);
   }
-
-
-  _checkConnection(NoInternetEvent event,Emitter<PagState> emit) async {
-    if(event.result == ConnectivityResult.mobile ||event.result == ConnectivityResult.wifi){
-      final newData = await apiService.getResult(1, state.count);
-      emit(state.copyWith(connection: true, result: newData.results));
-    }else if(event.result == ConnectivityResult.none){
-      emit(state.copyWith(connection: false, result: []));
-    }
-  }
-
   Future<bool> isInternetAvailable() async {
     final connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
@@ -55,7 +43,8 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
       final newData = await apiService.getResult(nextPage, state.count);
       await service.insertPaginatedList(newData.results);
       data = newData.results ?? [];
-      emit(state.copyWith(connection: true, result: newData.results, page: nextPage));
+      emit(state.copyWith(
+          connection: true, result: newData.results, page: nextPage));
     } else {
       final cachedData = await service.getCachedList();
       if (cachedData?.isNotEmpty ?? false) {
@@ -63,12 +52,11 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
       } else {
         data = [];
       }
-      emit(state.copyWith(connection: false));
     }
-    bool isCached = !isInternetConnected || (data.isNotEmpty && !isInternetConnected);
+    bool isCached =
+        !isInternetConnected || (data.isNotEmpty && !isInternetConnected);
     emit(state.copyWith(result: data, page: state.page, isCached: isCached));
   }
-
 
   void _onLoadNextPage(LoadNextPageEvent event, Emitter<PagState> emit) async {
     final nextPage = state.page + 1;
@@ -129,7 +117,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         search: event.name,
         next: '',
         isCached: false,
-        connection: false
+        connection: false,
       ),
     );
   }
@@ -139,13 +127,13 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     final newData = await apiService.getResult(initialPage, state.count);
     emit(
       PagState(
-          result: newData.results ?? [],
-          page: 1,
-          count: newData.results?.length ?? 0,
-          isLoading: false,
-          search: '',
-          next: newData.info?.next ?? '',
-          isCached: false,
+        result: newData.results ?? [],
+        page: 1,
+        count: newData.results?.length ?? 0,
+        isLoading: false,
+        search: '',
+        next: newData.info?.next ?? '',
+        isCached: false,
         connection: false,
       ),
     );
