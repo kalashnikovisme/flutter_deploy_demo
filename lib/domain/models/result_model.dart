@@ -2,6 +2,6 @@ class ResultModel {
   final int? id;
   final String? name;
   final String? image;
-
-  ResultModel({this.image, this.name, this.id});
+  bool isFavorite;
+  ResultModel({this.image, this.name, this.id, this.isFavorite = false});
 }

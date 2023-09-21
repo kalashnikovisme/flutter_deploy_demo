@@ -6,6 +6,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
@@ -44,7 +45,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          HomePage(email: state.user.email ?? ''),
+                          HomePage(),
                     ),
                     (route) => false,
                   );

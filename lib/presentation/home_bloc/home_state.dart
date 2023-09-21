@@ -18,6 +18,9 @@ class PagState extends Equatable {
 
   final bool connection;
 
+  final bool isFavourite;
+  final List<ResultModel> favoriteItems;
+
   const PagState({
     required this.result,
     required this.page,
@@ -27,6 +30,8 @@ class PagState extends Equatable {
     required this.search,
     required this.isCached,
     required this.connection,
+    required this.isFavourite,
+    required this.favoriteItems
   });
 
   PagState copyWith({
@@ -38,6 +43,8 @@ class PagState extends Equatable {
     String? search,
     bool? isCached,
     bool? connection,
+    bool? isFavourite,
+    List<ResultModel>? favoriteItems,
   }) =>
       PagState(
         result: result ?? this.result,
@@ -48,6 +55,8 @@ class PagState extends Equatable {
         next: next ?? this.next,
         isCached: isCached ?? this.isCached,
         connection: connection ?? this.connection,
+        isFavourite: isFavourite ?? this.isFavourite,
+          favoriteItems: favoriteItems ?? this.favoriteItems
       );
 
   @override

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_state.dart';
@@ -16,12 +18,12 @@ import 'package:test_intern/presentation/pages/enter_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+   MyApp({super.key});
+   final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -48,6 +50,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ConnectionCubit(),
+          ),
+          BlocProvider<FavoritesBloc>(
+            create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider<ErrorBloc>(
             lazy: false,

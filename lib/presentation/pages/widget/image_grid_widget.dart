@@ -1,21 +1,29 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:test_intern/domain/models/result_model.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
+import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
+import 'package:test_intern/presentation/home_bloc/home_event.dart';
+
 
 class ImageGridWidget extends StatelessWidget {
-  final String imageUrl;
-  final String nameCard;
+  final ResultModel resultModel;
+  final bool isFavourite;
 
   const ImageGridWidget({
-    super.key,
-    required this.imageUrl,
-    required this.nameCard,
+   required this.resultModel,
+    required this.isFavourite,
+
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
@@ -26,7 +34,7 @@ class ImageGridWidget extends StatelessWidget {
           child: Stack(
             children: [
               CachedNetworkImage(
-                imageUrl: imageUrl,
+                imageUrl: resultModel.image ?? '',
                 fit: BoxFit.contain,
                 width: double.infinity,
                 errorWidget: (context, url, error) {
@@ -64,7 +72,7 @@ class ImageGridWidget extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
-                      nameCard,
+                      resultModel.name ?? '',
                       style: TextsStyles.nameOnCard,
                       overflow: TextOverflow.ellipsis,
                       softWrap: true,
@@ -76,11 +84,19 @@ class ImageGridWidget extends StatelessWidget {
               Align(
                 alignment: Alignment.topLeft,
                 child: IconButton(
-                  icon: const Icon(
+                  icon: isFavourite
+                      ? const Icon(
                     Icons.favorite_outline,
                     color: ColorStyle.favouriteIconCardColor,
+                  )
+                      : const Icon(
+                    Icons.favorite,
+                    color: ColorStyle.favouriteIconCardColor,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    context.read<FavoritesBloc>().add(AddToFavoritesEvent(resultModel));
+                    context.read<HomeBloc>().add(AddToFavoritesHomeEvent(itemToAdd: resultModel));
+                  },
                 ),
               ),
             ],

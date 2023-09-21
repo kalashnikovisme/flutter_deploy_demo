@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
+import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
@@ -13,16 +14,16 @@ import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 import 'package:test_intern/presentation/pages/auth_page.dart';
+import 'package:test_intern/presentation/pages/favourites_page.dart';
 import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
 import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class HomePage extends StatefulWidget {
-  final String email;
 
-  const HomePage({Key? key, required this.email}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key,}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -31,7 +32,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController controller = TextEditingController();
-
+  final SQLService service = SQLService();
   @override
   void initState() {
     super.initState();
@@ -45,8 +46,8 @@ class _HomePageState extends State<HomePage> {
         BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
       }
     });
-  }
 
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +55,16 @@ class _HomePageState extends State<HomePage> {
         actions: const [
           LanguageSwitcher(),
         ],
+        leading: IconButton(
+          icon: Icon(Icons.favorite),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>  FavouritesPage(),
+              ),
+            );
+          },
+        ),
       ),
       body: BlocBuilder<ErrorBloc, ErrorState>(
         builder: (context, errorState) {
@@ -89,8 +100,8 @@ class _HomePageState extends State<HomePage> {
                               itemBuilder: (context, index) {
                                 if (index < state.result.length) {
                                   return ImageGridWidget(
-                                    imageUrl: state.result[index].image ?? '',
-                                    nameCard: state.result[index].name ?? '',
+                                   resultModel: state.result[index],
+                                    isFavourite: state.isFavourite,
                                   );
                                 }
                                 if (state.next.isEmpty) {
