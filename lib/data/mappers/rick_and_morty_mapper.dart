@@ -5,7 +5,8 @@ import 'package:test_intern/domain/models/rick_and_morty_model.dart';
 
 extension RickAndMortyFromDTOToModel on RickMortyCharactersDto {
   RickAndMortyModel toDomain() {
-    final resultList = results.map((resultDto) => resultDto.toDomain()).toList();
+    final resultList =
+        results.map((resultDto) => resultDto.toDomain()).toList();
     return RickAndMortyModel(results: resultList, info: info);
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
 import 'package:test_intern/data/repositories/sql_service.dart';
@@ -9,24 +8,22 @@ import 'package:test_intern/domain/models/result_model.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 
-
 class HomeBloc extends Bloc<PagEvent, PagState> {
   final ApiService apiService;
   final SQLService service = SQLService();
-  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-  HomeBloc(this.apiService)
+  final String userEmail;
+  HomeBloc(this.apiService, this.userEmail)
       : super(const PagState(
-          page: 1,
-          count: 20,
-          result: [],
-          isLoading: false,
-          search: '',
-          next: '',
-          isCached: false,
-          connection: false,
-          isFavourite: false,
-          favoriteItems: []
-        )) {
+            page: 1,
+            count: 20,
+            result: [],
+            isLoading: false,
+            search: '',
+            next: '',
+            isCached: false,
+            connection: false,
+            isFavourite: false,
+            favoriteItems: [])) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
     on<UpdateCountEvent>(_onUpdateCount);
@@ -37,25 +34,24 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     on<RemoveFromFavoritesHomeEvent>(_onRemoveFromFavorites);
   }
 
-
   Future<bool> isInternetAvailable() async {
     final connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
   }
-  void _onAddToFavorites(AddToFavoritesHomeEvent event, Emitter<PagState> emit) async {
+
+  void _onAddToFavorites(
+      AddToFavoritesHomeEvent event, Emitter<PagState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
     updatedFavorites.add(event.itemToAdd);
     emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: true));
-
     await service.saveToFavourite(event.itemToAdd, userEmail);
   }
 
-  void _onRemoveFromFavorites(RemoveFromFavoritesHomeEvent event, Emitter<PagState> emit) async {
-
+  void _onRemoveFromFavorites(
+      RemoveFromFavoritesHomeEvent event, Emitter<PagState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
     updatedFavorites.remove(event.itemToRemove);
     emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: false));
-
     await service.delete(event.itemToRemove, userEmail);
   }
 
@@ -143,8 +139,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           isCached: false,
           connection: false,
           isFavourite: false,
-          favoriteItems: []
-      ),
+          favoriteItems: []),
     );
   }
 
@@ -153,15 +148,15 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     final newData = await apiService.getResult(initialPage, state.count);
     emit(
       PagState(
-          result: newData.results ?? [],
-          page: 1,
-          count: newData.results?.length ?? 0,
-          isLoading: false,
-          search: '',
-          next: newData.info?.next ?? '',
-          isCached: false,
-          connection: false,
-          isFavourite: false,
+        result: newData.results ?? [],
+        page: 1,
+        count: newData.results?.length ?? 0,
+        isLoading: false,
+        search: '',
+        next: newData.info?.next ?? '',
+        isCached: false,
+        connection: false,
+        isFavourite: false,
         favoriteItems: [],
       ),
     );

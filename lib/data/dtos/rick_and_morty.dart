@@ -6,12 +6,11 @@ part 'rick_and_morty.g.dart';
 
 @JsonSerializable()
 class RickMortyCharactersDto {
-
   final InfoDto info;
 
   final List<ResultDto> results;
 
- const RickMortyCharactersDto({
+  const RickMortyCharactersDto({
     required this.info,
     required this.results,
   });

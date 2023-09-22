@@ -18,12 +18,12 @@ import 'package:test_intern/presentation/pages/enter_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
-   final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+  MyApp({super.key});
+  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -46,7 +46,8 @@ class MyApp extends StatelessWidget {
             create: (context) => AuthBloc(),
           ),
           BlocProvider<HomeBloc>(
-            create: (context) => HomeBloc(context.read<ApiService>()),
+            create: (context) =>
+                HomeBloc(context.read<ApiService>(), userEmail),
           ),
           BlocProvider(
             create: (context) => ConnectionCubit(),

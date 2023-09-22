@@ -10,20 +10,18 @@ import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 
-
 class ImageGridWidget extends StatelessWidget {
   final ResultModel resultModel;
+  final String email;
   final bool isFavourite;
-
-  const ImageGridWidget({
-   required this.resultModel,
-    required this.isFavourite,
-
-  });
+  const ImageGridWidget(
+      {super.key,
+      required this.resultModel,
+      this.email = '',
+      required this.isFavourite});
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
@@ -86,16 +84,20 @@ class ImageGridWidget extends StatelessWidget {
                 child: IconButton(
                   icon: isFavourite
                       ? const Icon(
-                    Icons.favorite_outline,
-                    color: ColorStyle.favouriteIconCardColor,
-                  )
+                          Icons.favorite_outline,
+                          color: ColorStyle.favouriteIconCardColor,
+                        )
                       : const Icon(
-                    Icons.favorite,
-                    color: ColorStyle.favouriteIconCardColor,
-                  ),
+                          Icons.favorite,
+                          color: ColorStyle.favouriteIconCardColor,
+                        ),
                   onPressed: () {
-                    context.read<FavoritesBloc>().add(AddToFavoritesEvent(resultModel));
-                    context.read<HomeBloc>().add(AddToFavoritesHomeEvent(itemToAdd: resultModel));
+                    context.read<FavoritesBloc>().add(AddToFavoritesEvent(
+                          resultModel,
+                        ));
+                    context.read<HomeBloc>().add(AddToFavoritesHomeEvent(
+                          itemToAdd: resultModel,
+                        ));
                   },
                 ),
               ),

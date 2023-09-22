@@ -30,5 +30,4 @@ class TextsStyles {
     fontSize: 16,
     color: ColorStyle.nameCardColor,
   );
-
 }

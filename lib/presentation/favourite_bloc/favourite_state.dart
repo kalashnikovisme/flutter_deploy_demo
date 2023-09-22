@@ -1,21 +1,32 @@
+import 'package:equatable/equatable.dart';
 import 'package:test_intern/domain/models/result_model.dart';
 
-abstract class FavoritesState {
-  const FavoritesState();
-}
-
-class FavoritesInitial extends FavoritesState {}
-
-class FavoritesLoading extends FavoritesState {}
-
-class FavoritesLoaded extends FavoritesState {
+class FavoritesState extends Equatable {
   final List<ResultModel> favoriteItems;
+  final String email;
+  final bool isLoading;
+  final bool isFavourite;
 
-  const FavoritesLoaded(this.favoriteItems);
-}
+  const FavoritesState({
+    required this.favoriteItems,
+    required this.isFavourite,
+    required this.isLoading,
+    required this.email,
+  });
 
-class FavoritesError extends FavoritesState {
-  final String errorMessage;
+  FavoritesState copyWith(
+      {List<ResultModel>? favoriteItems,
+      bool? isFavourite,
+      String? email,
+      bool? isLoading}) {
+    return FavoritesState(
+      favoriteItems: favoriteItems ?? this.favoriteItems,
+      isFavourite: isFavourite ?? this.isFavourite,
+      isLoading: isLoading ?? this.isLoading,
+      email: email ?? this.email,
+    );
+  }
 
-  const FavoritesError(this.errorMessage);
+  @override
+  List<Object?> get props => [favoriteItems, email, isLoading, isFavourite];
 }

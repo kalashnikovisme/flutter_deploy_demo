@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
-import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
@@ -21,9 +20,12 @@ import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key,}) : super(key: key);
+  final String email;
+  const HomePage({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -32,7 +34,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController controller = TextEditingController();
-  final SQLService service = SQLService();
+
   @override
   void initState() {
     super.initState();
@@ -46,8 +48,8 @@ class _HomePageState extends State<HomePage> {
         BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
       }
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,11 +58,13 @@ class _HomePageState extends State<HomePage> {
           LanguageSwitcher(),
         ],
         leading: IconButton(
-          icon: Icon(Icons.favorite),
+          icon: const Icon(Icons.favorite),
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) =>  FavouritesPage(),
+                builder: (context) => FavouritesPage(
+                  userEmail: widget.email,
+                ),
               ),
             );
           },
@@ -99,8 +103,9 @@ class _HomePageState extends State<HomePage> {
                               itemCount: state.result.length + 1,
                               itemBuilder: (context, index) {
                                 if (index < state.result.length) {
+                                  final list = state.result[index];
                                   return ImageGridWidget(
-                                   resultModel: state.result[index],
+                                    resultModel: list,
                                     isFavourite: state.isFavourite,
                                   );
                                 }

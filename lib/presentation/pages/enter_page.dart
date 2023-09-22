@@ -28,7 +28,7 @@ class _EnterPageState extends State<EnterPage> {
         builder: (context, state) {
           if (state is CheckAuth) {
             if (state.auth) {
-              return RootScreen();
+              return const RootScreen();
             } else {
               return const RegistrationScreen();
             }

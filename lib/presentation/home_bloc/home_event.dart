@@ -34,11 +34,14 @@ class ClearSearchEvent extends PagEvent {}
 
 class AddToFavoritesHomeEvent extends PagEvent {
   final ResultModel itemToAdd;
-
-  AddToFavoritesHomeEvent({required this.itemToAdd});
+  AddToFavoritesHomeEvent({
+    required this.itemToAdd,
+  });
 
   @override
-  List<Object?> get props => [itemToAdd];
+  List<Object?> get props => [
+        itemToAdd,
+      ];
 }
 
 class RemoveFromFavoritesHomeEvent extends PagEvent {
@@ -48,8 +51,4 @@ class RemoveFromFavoritesHomeEvent extends PagEvent {
 
   @override
   List<Object?> get props => [itemToRemove];
-}
-
-class ClearFavoritesEvent extends PagEvent {
-  ClearFavoritesEvent();
 }

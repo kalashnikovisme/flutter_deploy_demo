@@ -14,27 +14,28 @@ class RootScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
-          create: (context) => ApiService(errorHandler: (String message) {
-            context.read<ErrorBloc>().add(
-              ShowErrorEvent(
-                message: message,
-              ),
-            );
-          },),
+          create: (context) => ApiService(
+            errorHandler: (String message) {
+              context.read<ErrorBloc>().add(
+                    ShowErrorEvent(
+                      message: message,
+                    ),
+                  );
+            },
+          ),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                FavoritesBloc(userEmail),
+            create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider(
-            create: (context) => HomeBloc(context.read<ApiService>()),
+            create: (context) =>
+                HomeBloc(context.read<ApiService>(), userEmail),
           ),
         ],
         child: Navigator(
@@ -42,7 +43,9 @@ class RootScreen extends StatelessWidget {
             WidgetBuilder builder;
             switch (settings.name) {
               default:
-                builder = (BuildContext _) =>  HomePage();
+                builder = (BuildContext _) => HomePage(
+                      email: userEmail,
+                    );
             }
             return MaterialPageRoute(builder: builder, settings: settings);
           },

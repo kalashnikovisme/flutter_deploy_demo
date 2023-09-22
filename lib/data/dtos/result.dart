@@ -4,7 +4,6 @@ part 'result.g.dart';
 
 @JsonSerializable()
 class ResultDto {
-
   final int? id;
 
   final String? name;
