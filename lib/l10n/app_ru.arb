@@ -1,6 +1,6 @@
 {
   "errorImageString": "Изображение не загрузилось",
-  "allDataLoadedString": "Все данные загружены",
+  "allDataLoadedString": "Загружено",
   "searchByName": "Искать по имени",
   "exitButtonString": "Выход",
   "exitModalString": "Хотите выйти?",
@@ -10,5 +10,7 @@
   "signInString": "Войти",
   "passwordString": "Пароль",
   "favourites": "Избранное",
-  "emptyFavs": "Список избранного пуст"
+  "emptyFavs": "Список избранного пуст",
+  "dataCache": "Данные из кэша",
+  "dataApi": "Данные из сети"
 }

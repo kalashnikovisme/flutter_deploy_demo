@@ -15,15 +15,48 @@ import 'package:test_intern/presentation/localization_bloc/localization_state.da
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:test_intern/presentation/pages/enter_page.dart';
 
+import 'data/repositories/sql_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+  bool? userAuth;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (mounted) {
+        if (user == null) {
+          if (userAuth != false) {
+            setState(() {
+              userAuth = false;
+            });
+          }
+        } else {
+          if (userAuth != true) {
+            await SQLService().saveToken(user.email ?? '');
+            setState(() {
+              userAuth = true;
+            });
+          }
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -46,13 +79,13 @@ class MyApp extends StatelessWidget {
             create: (context) => AuthBloc(),
           ),
           BlocProvider<HomeBloc>(
-            create: (context) =>
-                HomeBloc(context.read<ApiService>(), userEmail),
+            create: (context) => HomeBloc(context.read<ApiService>()),
           ),
           BlocProvider(
             create: (context) => ConnectionCubit(),
           ),
           BlocProvider<FavoritesBloc>(
+            lazy: false,
             create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider<ErrorBloc>(

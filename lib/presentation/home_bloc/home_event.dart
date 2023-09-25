@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:test_intern/domain/models/result_model.dart';
 
 abstract class PagEvent extends Equatable {
   @override
@@ -31,24 +30,3 @@ class SearchNameEvent extends PagEvent {
 }
 
 class ClearSearchEvent extends PagEvent {}
-
-class AddToFavoritesHomeEvent extends PagEvent {
-  final ResultModel itemToAdd;
-  AddToFavoritesHomeEvent({
-    required this.itemToAdd,
-  });
-
-  @override
-  List<Object?> get props => [
-        itemToAdd,
-      ];
-}
-
-class RemoveFromFavoritesHomeEvent extends PagEvent {
-  final ResultModel itemToRemove;
-
-  RemoveFromFavoritesHomeEvent({required this.itemToRemove});
-
-  @override
-  List<Object?> get props => [itemToRemove];
-}

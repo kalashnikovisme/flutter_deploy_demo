@@ -4,7 +4,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:test_intern/presentation/pages/widget/no_internet_widget.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -24,6 +24,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Вход'),
+        actions: const [
+          NoInternetBanner(),
+        ],
       ),
       body: BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(),
@@ -85,30 +88,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                RegisterEvent(
-                                  email: email,
-                                  password: password,
-                                ),
+                                RegisterEvent(email: email, password: password),
                               );
                         },
-                        child: Text(
-                          AppLocalizations.of(context)?.registerString ?? '',
-                        ),
+                        child: const Text('Зарегистрироваться'),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                SignInEvent(
-                                  email: email,
-                                  password: password,
-                                ),
+                                SignInEvent(email: email, password: password),
                               );
                         },
-                        child: Text(
-                          AppLocalizations.of(context)?.signInString ?? '',
-                        ),
+                        child: const Text('Войти'),
                       ),
                     ],
                   ),

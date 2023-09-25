@@ -27,7 +27,7 @@ class SQLService {
     CREATE TABLE User (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       firebaseToken TEXT,
-      userEmail TEXT
+      userEmail TEXT UNIQUE
     )
   ''');
 
@@ -39,15 +39,25 @@ class SQLService {
       userEmail TEXT
     )
   ''');
+    await db.execute('''CREATE TABLE user_characters (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER,
+  character_id INTEGER,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (character_id) REFERENCES characters(id)
+);''');
   }
 
   Future<List<ResultModel>?> getFavoriteCharacters(String userEmail) async {
     final db = await this.db;
-    final result = await db?.query(
-      "characters",
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
-    );
+
+    final result = await db?.rawQuery('''
+    SELECT characters.*
+    FROM characters
+    INNER JOIN user_characters ON characters.id = user_characters.character_id
+    WHERE user_characters.user_id = ? AND characters.userEmail = ?
+  ''', [userEmail, userEmail]);
+
     return result?.map((map) {
       return ResultModel(
         id: map['id'] as int,
@@ -59,17 +69,28 @@ class SQLService {
 
   Future<int?> saveToFavourite(ResultModel character, String userEmail) async {
     final Database? db = await this.db;
-    int? result = await db?.insert(
+
+    int? characterId = await db?.insert(
       'characters',
       {
-        'id': character.id,
         'name': character.name,
         'image': character.image,
         'userEmail': userEmail,
       },
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return result;
+
+    if (characterId != null) {
+      int? result = await db?.insert(
+        'user_characters',
+        {
+          'user_id': userEmail,
+          'character_id': characterId,
+        },
+      );
+      return result;
+    } else {
+      return null;
+    }
   }
 
   Future<int?> delete(
@@ -77,24 +98,20 @@ class SQLService {
     String userEmail,
   ) async {
     final Database? db = await this.db;
+
+    await db?.delete(
+      'user_characters',
+      where: 'user_id = ? AND character_id = ?',
+      whereArgs: [userEmail, model.id],
+    );
+
     final result = await db?.delete(
       'characters',
       where: 'id = ? AND userEmail = ?',
       whereArgs: [model.id, userEmail],
     );
+
     return result;
-  }
-
-  Future<void> createUserEntry(String newUserEmail) async {
-    final db = await this.db;
-
-    await db?.insert(
-      'User',
-      {
-        'userEmail': newUserEmail,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
   }
 
   Future<void> saveToken(String token) async {

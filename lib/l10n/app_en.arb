@@ -10,5 +10,7 @@
   "signInString": "Sign in",
   "passwordString": "Password",
   "favourites": "Favourites",
-  "emptyFavs": "List of favourites is empty"
+  "emptyFavs": "List of favourites is empty",
+  "dataCache": "Data loaded from cache",
+  "dataApi": "Data loaded from network"
 }

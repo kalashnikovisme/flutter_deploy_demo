@@ -31,11 +31,11 @@ class RootScreen extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            lazy: false,
             create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider(
-            create: (context) =>
-                HomeBloc(context.read<ApiService>(), userEmail),
+            create: (context) => HomeBloc(context.read<ApiService>()),
           ),
         ],
         child: Navigator(

@@ -11,8 +11,7 @@ import 'package:test_intern/presentation/home_bloc/home_state.dart';
 class HomeBloc extends Bloc<PagEvent, PagState> {
   final ApiService apiService;
   final SQLService service = SQLService();
-  final String userEmail;
-  HomeBloc(this.apiService, this.userEmail)
+  HomeBloc(this.apiService)
       : super(const PagState(
             page: 1,
             count: 20,
@@ -30,29 +29,11 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     on<RefreshDataEvent>(_onRefreshData);
     on<SearchNameEvent>(_onSearch);
     on<ClearSearchEvent>(_onClearSearch);
-    on<AddToFavoritesHomeEvent>(_onAddToFavorites);
-    on<RemoveFromFavoritesHomeEvent>(_onRemoveFromFavorites);
   }
 
   Future<bool> isInternetAvailable() async {
     final connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
-  }
-
-  void _onAddToFavorites(
-      AddToFavoritesHomeEvent event, Emitter<PagState> emit) async {
-    final updatedFavorites = List.of(state.favoriteItems);
-    updatedFavorites.add(event.itemToAdd);
-    emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: true));
-    await service.saveToFavourite(event.itemToAdd, userEmail);
-  }
-
-  void _onRemoveFromFavorites(
-      RemoveFromFavoritesHomeEvent event, Emitter<PagState> emit) async {
-    final updatedFavorites = List.of(state.favoriteItems);
-    updatedFavorites.remove(event.itemToRemove);
-    emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: false));
-    await service.delete(event.itemToRemove, userEmail);
   }
 
   void _onLoadData(LoadListEvent event, Emitter<PagState> emit) async {
@@ -139,7 +120,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           isCached: false,
           connection: false,
           isFavourite: false,
-          favoriteItems: []),
+          favoriteItems: const []),
     );
   }
 
@@ -157,7 +138,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         isCached: false,
         connection: false,
         isFavourite: false,
-        favoriteItems: [],
+        favoriteItems: const [],
       ),
     );
   }

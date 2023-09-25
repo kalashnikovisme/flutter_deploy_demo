@@ -34,5 +34,3 @@ class SignInEvent extends AuthEvent {
 class SignOutEvent extends AuthEvent {
   SignOutEvent();
 }
-
-class CheckAuthorizationEvent extends AuthEvent {}

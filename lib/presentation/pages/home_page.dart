@@ -12,7 +12,6 @@ import 'package:test_intern/presentation/error_bloc/error_state.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
-import 'package:test_intern/presentation/pages/auth_page.dart';
 import 'package:test_intern/presentation/pages/favourites_page.dart';
 import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
@@ -38,16 +37,20 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
-    final connectionCubit = context.read<ConnectionCubit>();
-    connectionCubit.stream.listen((connectionState) {
-      if (connectionState.result == ConnectivityResult.mobile ||
-          connectionState.result == ConnectivityResult.wifi ||
-          connectionState.result == ConnectivityResult.none) {
-        BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
-        BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
-      }
-    });
+    if (mounted) {
+      BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+      final connectionCubit = context.read<ConnectionCubit>();
+      connectionCubit.stream.listen((connectionState) {
+        if (mounted) {
+          if (connectionState.result == ConnectivityResult.mobile ||
+              connectionState.result == ConnectivityResult.wifi ||
+              connectionState.result == ConnectivityResult.none) {
+            BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
+            BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -106,7 +109,6 @@ class _HomePageState extends State<HomePage> {
                                   final list = state.result[index];
                                   return ImageGridWidget(
                                     resultModel: list,
-                                    isFavourite: state.isFavourite,
                                   );
                                 }
                                 if (state.next.isEmpty) {
@@ -117,6 +119,29 @@ class _HomePageState extends State<HomePage> {
                                           '',
                                       style: TextsStyles.allDataLoadedString,
                                     ),
+                                  );
+                                }
+                                if (state.isCached) {
+                                  WidgetsBinding.instance.addPostFrameCallback(
+                                    (_) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: state.isCached
+                                              ? Colors.green
+                                              : Colors.red,
+                                          content: state.isCached
+                                              ? Text(
+                                                  AppLocalizations.of(context)
+                                                          ?.dataCache ??
+                                                      '')
+                                              : Text(
+                                                  AppLocalizations.of(context)
+                                                          ?.dataApi ??
+                                                      ''),
+                                        ),
+                                      );
+                                    },
                                   );
                                 }
                                 return const Center(
@@ -175,13 +200,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               onPressed: () {
                 context.read<AuthBloc>().add(SignOutEvent());
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegistrationScreen(),
-                  ),
-                  (route) => false,
-                );
+                Navigator.of(context).pop();
               },
               child: Text(
                 AppLocalizations.of(context)?.yes ?? '',

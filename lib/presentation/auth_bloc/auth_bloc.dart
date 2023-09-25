@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/firebase_service.dart';
 import 'package:test_intern/data/repositories/interceptors/auth_firebase_interceptor.dart';
@@ -16,26 +17,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_registerUser);
     on<SignInEvent>(_signIn);
     on<SignOutEvent>(_signOut);
-    on<CheckAuthorizationEvent>(_checkAuthorization);
   }
 
   bool _isEmailAndPasswordEmpty(String email, String password) {
     return email.isEmpty || password.isEmpty;
-  }
-
-  void _checkAuthorization(
-      CheckAuthorizationEvent event, Emitter<AuthState> emit) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        emit(const CheckAuth(null, false));
-      } else {
-        final tokenExists = await sQlService.isTokenExist();
-        emit(CheckAuth(user, tokenExists));
-      }
-    } on FirebaseAuthException catch (e) {
-      emit(AuthErrorState(e.getErrorMessage()));
-    }
   }
 
   void _registerUser(RegisterEvent event, Emitter<AuthState> emit) async {
@@ -53,7 +38,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(const AuthErrorState("User registration failed."));
         }
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }
@@ -67,7 +53,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             await fireBaseService.signInUser(event.email, event.password);
         emit(AuthAuthenticated(user!));
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }

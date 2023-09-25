@@ -1,8 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
-import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
-import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
+import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/pages/auth_page.dart';
 import 'package:test_intern/root_screen.dart';
 
@@ -14,28 +12,35 @@ class EnterPage extends StatefulWidget {
 }
 
 class _EnterPageState extends State<EnterPage> {
+  bool? userAuth;
+
   @override
   void initState() {
     super.initState();
-    final authBloc = BlocProvider.of<AuthBloc>(context);
-    authBloc.add(CheckAuthorizationEvent());
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (mounted) {
+        if (user == null) {
+          if (userAuth != false) {
+            setState(() {
+              userAuth = false;
+            });
+          }
+        } else {
+          if (userAuth != true) {
+            await SQLService().saveToken(user.email ?? '');
+            setState(() {
+              userAuth = true;
+            });
+          }
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is CheckAuth) {
-            if (state.auth) {
-              return const RootScreen();
-            } else {
-              return const RegistrationScreen();
-            }
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
-      ),
-    );
+    return (userAuth ?? false)
+        ? const RootScreen()
+        : const RegistrationScreen();
   }
 }

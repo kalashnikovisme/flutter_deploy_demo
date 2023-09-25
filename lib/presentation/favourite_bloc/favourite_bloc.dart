@@ -32,7 +32,18 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       AddToFavoritesEvent event, Emitter<FavoritesState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
     updatedFavorites.add(event.item);
-    emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: true));
+
+    if (!updatedFavorites.contains(event.item)) {
+      updatedFavorites.add(event.item);
+    }
+
+    emit(FavoritesState(
+      favoriteItems: updatedFavorites,
+      isLoading: false,
+      email: userEmail,
+      isFavourite: true,
+    ));
+
     await service.saveToFavourite(event.item, userEmail);
   }
 
@@ -40,7 +51,18 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       RemoveFromFavoritesEvent event, Emitter<FavoritesState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
     updatedFavorites.remove(event.item);
-    emit(state.copyWith(favoriteItems: updatedFavorites, isFavourite: false));
+
+    if (updatedFavorites.contains(event.item)) {
+      updatedFavorites.remove(event.item);
+    }
+
+    emit(FavoritesState(
+      favoriteItems: updatedFavorites,
+      isLoading: false,
+      email: userEmail,
+      isFavourite: false,
+    ));
+
     await service.delete(event.item, userEmail);
   }
 }

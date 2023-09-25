@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
-import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
-import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FavouritesPage extends StatefulWidget {
@@ -27,11 +25,13 @@ class _FavouritesPageState extends State<FavouritesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final favoritesBloc = context.read<FavoritesBloc>();
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.favourites ?? ''),
       ),
       body: BlocBuilder<FavoritesBloc, FavoritesState>(
+        bloc: favoritesBloc,
         builder: (context, state) {
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -42,21 +42,26 @@ class _FavouritesPageState extends State<FavouritesPage> {
                 itemCount: favoriteItems.length,
                 itemBuilder: (context, index) {
                   final item = favoriteItems[index];
-                  return ListTile(
+                  return Dismissible(
                     key: UniqueKey(),
-                    title: Text(item.name ?? ''),
-                    trailing: IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: const Padding(
+                        padding: EdgeInsets.only(right: 16.0),
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
                       ),
-                      onPressed: () {
-                        BlocProvider.of<FavoritesBloc>(context)
-                            .add(RemoveFromFavoritesEvent(item));
-                        BlocProvider.of<HomeBloc>(context).add(
-                          RemoveFromFavoritesHomeEvent(itemToRemove: item),
-                        );
-                      },
+                    ),
+                    onDismissed: (direction) {
+                      BlocProvider.of<FavoritesBloc>(context)
+                          .add(RemoveFromFavoritesEvent(item));
+                    },
+                    child: ListTile(
+                      title: Text(item.name ?? ''),
                     ),
                   );
                 },
