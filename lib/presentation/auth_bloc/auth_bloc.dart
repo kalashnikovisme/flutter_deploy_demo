@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/firebase_service.dart';
 import 'package:test_intern/data/repositories/interceptors/auth_firebase_interceptor.dart';
@@ -39,7 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       }
     } on FirebaseAuthException catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      //FirebaseCrashlytics.instance.recordError(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }
@@ -54,7 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthAuthenticated(user!));
       }
     } on FirebaseAuthException catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      // FirebaseCrashlytics.instance.recordError(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }

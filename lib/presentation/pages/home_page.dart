@@ -128,16 +128,16 @@ class _HomePageState extends State<HomePage> {
                                           .showSnackBar(
                                         SnackBar(
                                           backgroundColor: state.isCached
-                                              ? Colors.green
-                                              : Colors.red,
+                                              ? Colors.red
+                                              : Colors.green,
                                           content: state.isCached
                                               ? Text(
                                                   AppLocalizations.of(context)
-                                                          ?.dataCache ??
+                                                          ?.dataApi ??
                                                       '')
                                               : Text(
                                                   AppLocalizations.of(context)
-                                                          ?.dataApi ??
+                                                          ?.dataCache ??
                                                       ''),
                                         ),
                                       );

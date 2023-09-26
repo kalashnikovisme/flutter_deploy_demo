@@ -5,11 +5,12 @@ import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../data/repositories/sql_service.dart';
+
 class FavouritesPage extends StatefulWidget {
   final String userEmail;
   const FavouritesPage({
     required this.userEmail,
-    super.key,
   });
 
   @override
@@ -17,15 +18,25 @@ class FavouritesPage extends StatefulWidget {
 }
 
 class _FavouritesPageState extends State<FavouritesPage> {
+  late FavoritesBloc favoritesBloc;
+
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<FavoritesBloc>(context).add(FavoritesLoadedEvent());
+    favoritesBloc = context.read<FavoritesBloc>();
+    _loadFavoritesData();
+  }
+
+  Future<void> _loadFavoritesData() async {
+    final favorites =
+        await SQLService().getFavoriteCharacters(widget.userEmail);
+    favoritesBloc.add(FavoritesLoadedEvent(favorites));
   }
 
   @override
   Widget build(BuildContext context) {
     final favoritesBloc = context.read<FavoritesBloc>();
+    print(favoritesBloc.state);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.favourites ?? ''),
@@ -66,12 +77,11 @@ class _FavouritesPageState extends State<FavouritesPage> {
                   );
                 },
               );
-            } else {
-              return Center(
-                child: Text(AppLocalizations.of(context)?.emptyFavs ?? ''),
-              );
             }
           }
+          return Center(
+            child: Text(AppLocalizations.of(context)?.emptyFavs ?? ''),
+          );
         },
       ),
     );

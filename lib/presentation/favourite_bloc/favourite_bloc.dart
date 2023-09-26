@@ -26,12 +26,14 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         isFavourite: true,
         isLoading: false,
         email: userEmail));
+
+    print('from bloc');
+    print(albumsList);
   }
 
   void _onAddToFavorites(
       AddToFavoritesEvent event, Emitter<FavoritesState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
-    updatedFavorites.add(event.item);
 
     if (!updatedFavorites.contains(event.item)) {
       updatedFavorites.add(event.item);

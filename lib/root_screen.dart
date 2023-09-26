@@ -14,6 +14,7 @@ class RootScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -31,11 +32,12 @@ class RootScreen extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            lazy: false,
             create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider(
-            create: (context) => HomeBloc(context.read<ApiService>()),
+            create: (context) => HomeBloc(
+              context.read<ApiService>(),
+            ),
           ),
         ],
         child: Navigator(
@@ -43,9 +45,7 @@ class RootScreen extends StatelessWidget {
             WidgetBuilder builder;
             switch (settings.name) {
               default:
-                builder = (BuildContext _) => HomePage(
-                      email: userEmail,
-                    );
+                builder = (BuildContext _) => HomePage(email: userEmail);
             }
             return MaterialPageRoute(builder: builder, settings: settings);
           },

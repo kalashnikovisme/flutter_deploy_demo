@@ -7,7 +7,7 @@ class SQLService {
 
   Future<Database?> get db async {
     if (_db == null) {
-      _db = await _initDB();
+      _db = await initDB();
       if (_db == null) {
         throw Exception("Database is null");
       }
@@ -15,7 +15,7 @@ class SQLService {
     return _db;
   }
 
-  Future<Database> _initDB() async {
+  Future<Database> initDB() async {
     final String dbPath =
         path.join(await getDatabasesPath(), "user_database.db");
     final charDB = await openDatabase(dbPath, version: 1, onCreate: _createDB);
@@ -36,7 +36,8 @@ class SQLService {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       image BLOB,
-      userEmail TEXT
+      userEmail TEXT,
+      liked INTEGER
     )
   ''');
     await db.execute('''CREATE TABLE user_characters (
@@ -52,66 +53,100 @@ class SQLService {
     final db = await this.db;
 
     final result = await db?.rawQuery('''
-    SELECT characters.*
+    SELECT characters.*, user_characters.id AS liked
     FROM characters
-    INNER JOIN user_characters ON characters.id = user_characters.character_id
-    WHERE user_characters.user_id = ? AND characters.userEmail = ?
+    LEFT JOIN user_characters ON characters.id = user_characters.character_id
+      AND user_characters.user_id = ?
+    WHERE characters.userEmail = ?
   ''', [userEmail, userEmail]);
 
+    print(result?.map((e) => e));
+    print(userEmail);
     return result?.map((map) {
       return ResultModel(
-        id: map['id'] as int,
-        name: map['name'] as String,
-        image: map['image'] as String,
-      );
+          id: map['id'] as int,
+          name: map['name'] as String,
+          image: map['image'] as String,
+          isLiked: map['liked'] == 1);
     }).toList();
   }
 
-  Future<int?> saveToFavourite(ResultModel character, String userEmail) async {
-    final Database? db = await this.db;
+  Future<void> saveToFavourite(ResultModel character, String userEmail) async {
+    final db = await this.db;
 
-    int? characterId = await db?.insert(
+    final existingCharacter = await db?.query(
       'characters',
-      {
-        'name': character.name,
-        'image': character.image,
-        'userEmail': userEmail,
-      },
+      where: 'name = ? AND userEmail = ?',
+      whereArgs: [character.name, userEmail],
     );
 
-    if (characterId != null) {
-      int? result = await db?.insert(
+    if (existingCharacter != null && existingCharacter.isNotEmpty) {
+      print('вот тут чекаем есть ли такой перс, чтобы не было дублей');
+      final isCharacterLiked = await db?.query(
         'user_characters',
+        where: 'user_id = ? AND character_id = ?',
+        whereArgs: [userEmail, existingCharacter[0]['id']],
+      );
+
+      if (isCharacterLiked != null && isCharacterLiked.isNotEmpty) {
+        print('уже в избранном, угомонись, не дублируется');
+      } else {
+        await db?.insert(
+          'user_characters',
+          {
+            'user_id': userEmail,
+            'character_id': existingCharacter[0]['id'],
+          },
+        );
+      }
+    } else {
+      print('вот тут добавляешь, если нет такого перса');
+      final characterId = await db?.insert(
+        'characters',
         {
-          'user_id': userEmail,
-          'character_id': characterId,
+          'name': character.name,
+          'image': character.image,
+          'userEmail': userEmail,
+          'liked': character.isLiked ? 1 : 0
         },
       );
-      return result;
-    } else {
-      return null;
+
+      if (characterId != null) {
+        print('вот тут добавлена связь(!!!) в таблицу');
+        await db?.insert(
+          'user_characters',
+          {
+            'user_id': userEmail,
+            'character_id': characterId,
+          },
+        );
+      }
     }
   }
 
-  Future<int?> delete(
-    ResultModel model,
-    String userEmail,
-  ) async {
-    final Database? db = await this.db;
+  Future<void> delete(ResultModel character, String userEmail) async {
+    final db = await this.db;
 
-    await db?.delete(
-      'user_characters',
-      where: 'user_id = ? AND character_id = ?',
-      whereArgs: [userEmail, model.id],
-    );
-
-    final result = await db?.delete(
+    final existingCharacter = await db?.query(
       'characters',
-      where: 'id = ? AND userEmail = ?',
-      whereArgs: [model.id, userEmail],
+      where: 'name = ? AND userEmail = ?',
+      whereArgs: [character.name, userEmail],
     );
 
-    return result;
+    if (existingCharacter != null && existingCharacter.isNotEmpty) {
+      print('чекаем и удаляем запись(!!!!!) о персонаже');
+      await db?.delete(
+        'characters',
+        where: 'id = ?',
+        whereArgs: [existingCharacter[0]['id']],
+      );
+      print('вообще совсем удаляем связь (!!!!) из таблицы');
+      await db?.delete(
+        'user_characters',
+        where: 'user_id = ? AND character_id = ?',
+        whereArgs: [userEmail, existingCharacter[0]['id']],
+      );
+    }
   }
 
   Future<void> saveToken(String token) async {

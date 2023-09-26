@@ -4,6 +4,8 @@ import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/pages/auth_page.dart';
 import 'package:test_intern/root_screen.dart';
 
+import '../../main.dart';
+
 class EnterPage extends StatefulWidget {
   const EnterPage({super.key});
 
@@ -39,8 +41,6 @@ class _EnterPageState extends State<EnterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return (userAuth ?? false)
-        ? const RootScreen()
-        : const RegistrationScreen();
+    return (userAuth ?? false) ? RootScreen() : const RegistrationScreen();
   }
 }

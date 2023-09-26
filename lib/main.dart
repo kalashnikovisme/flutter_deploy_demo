@@ -20,45 +20,18 @@ import 'data/repositories/sql_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await SQLService().initDB();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-  bool? userAuth;
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      if (mounted) {
-        if (user == null) {
-          if (userAuth != false) {
-            setState(() {
-              userAuth = false;
-            });
-          }
-        } else {
-          if (userAuth != true) {
-            await SQLService().saveToken(user.email ?? '');
-            setState(() {
-              userAuth = true;
-            });
-          }
-        }
-      }
-    });
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+    final favoritesBloc = FavoritesBloc(userEmail);
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -81,28 +54,14 @@ class _MyAppState extends State<MyApp> {
           BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(context.read<ApiService>()),
           ),
-          BlocProvider(
+          BlocProvider<ConnectionCubit>(
             create: (context) => ConnectionCubit(),
           ),
-          BlocProvider<FavoritesBloc>(
-            lazy: false,
-            create: (context) => FavoritesBloc(userEmail),
+          BlocProvider<FavoritesBloc>.value(
+            value: favoritesBloc,
           ),
           BlocProvider<ErrorBloc>(
-            lazy: false,
             create: (context) => ErrorBloc(),
-            child: RepositoryProvider<ApiService>(
-              lazy: true,
-              create: (context) => ApiService(
-                errorHandler: (String message) {
-                  context.read<ErrorBloc>().add(
-                        ShowErrorEvent(
-                          message: message,
-                        ),
-                      );
-                },
-              ),
-            ),
           ),
         ],
         child: BlocProvider(
@@ -120,7 +79,7 @@ class _MyAppState extends State<MyApp> {
                       ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                   useMaterial3: true,
                 ),
-                home: const EnterPage(),
+                home: EnterPage(),
               );
             },
           ),

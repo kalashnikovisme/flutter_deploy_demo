@@ -12,114 +12,121 @@ import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
 
 class ImageGridWidget extends StatefulWidget {
   final ResultModel resultModel;
+
   const ImageGridWidget({
-    super.key,
+    Key? key,
     required this.resultModel,
-  });
+  }) : super(key: key);
 
   @override
   State<ImageGridWidget> createState() => _ImageGridWidgetState();
 }
 
-final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-
 class _ImageGridWidgetState extends State<ImageGridWidget> {
+  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (BuildContext context) => FavoritesBloc(userEmail),
-      child: BlocBuilder<FavoritesBloc, FavoritesState>(
-        builder: (context, state) {
-          return Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
-              child: Container(
-                width: double.infinity,
-                color: ColorStyle.errorImageColor,
-                child: Stack(
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: widget.resultModel.image ?? '',
-                      fit: BoxFit.contain,
+    final favoritesBloc = context.read<FavoritesBloc>();
+    print('object');
+    return BlocBuilder<FavoritesBloc, FavoritesState>(
+      bloc: favoritesBloc,
+      builder: (context, state) {
+        print('here');
+        final isItemInFavorites =
+            state.favoriteItems.contains(widget.resultModel);
+
+        print("ну че?");
+        print(isItemInFavorites);
+
+        return Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: Container(
+              width: double.infinity,
+              color: ColorStyle.errorImageColor,
+              child: Stack(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: widget.resultModel.image ?? '',
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                    errorWidget: (context, url, error) {
+                      return Center(
+                        child: Text(
+                          AppLocalizations.of(context)?.errorImageString ?? '',
+                          textAlign: TextAlign.center,
+                          style: TextsStyles.errorImageCardString,
+                          overflow: TextOverflow.fade,
+                          softWrap: true,
+                        ),
+                      );
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
                       width: double.infinity,
-                      errorWidget: (context, url, error) {
-                        return Center(
-                          child: Text(
-                            AppLocalizations.of(context)?.errorImageString ??
-                                '',
-                            textAlign: TextAlign.center,
-                            style: TextsStyles.errorImageCardString,
-                            overflow: TextOverflow.fade,
-                            softWrap: true,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: ColorStyle.homeCardColor,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 3,
+                            offset: const Offset(0, 3),
                           ),
-                        );
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(
+                          widget.resultModel.name ?? '',
+                          style: TextsStyles.nameOnCard,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: isItemInFavorites
+                          ? const Icon(
+                              Icons.favorite,
+                              color: ColorStyle.favouriteIconCardColor,
+                            )
+                          : const Icon(
+                              Icons.favorite_outline,
+                              color: ColorStyle.favouriteIconCardColor,
+                            ),
+                      onPressed: () {
+                        if (isItemInFavorites) {
+                          context.read<FavoritesBloc>().add(
+                                RemoveFromFavoritesEvent(widget.resultModel),
+                              );
+                        } else {
+                          context.read<FavoritesBloc>().add(
+                                AddToFavoritesEvent(widget.resultModel),
+                              );
+                        }
                       },
                     ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        width: double.infinity,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: ColorStyle.homeCardColor,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(12.0),
-                            bottomRight: Radius.circular(12.0),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            widget.resultModel.name ?? '',
-                            style: TextsStyles.nameOnCard,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: true,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: IconButton(
-                        icon: state.isFavourite
-                            ? const Icon(
-                                Icons.favorite,
-                                color: ColorStyle.favouriteIconCardColor,
-                              )
-                            : const Icon(
-                                Icons.favorite_outline,
-                                color: ColorStyle.favouriteIconCardColor,
-                              ),
-                        onPressed: () {
-                          if (state.isFavourite) {
-                            context.read<FavoritesBloc>().add(
-                                  RemoveFromFavoritesEvent(widget.resultModel),
-                                );
-                          } else {
-                            context.read<FavoritesBloc>().add(
-                                  AddToFavoritesEvent(widget.resultModel),
-                                );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
