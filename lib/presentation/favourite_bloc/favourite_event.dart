@@ -17,8 +17,8 @@ class RemoveFromFavoritesEvent extends FavoritesEvent {
   RemoveFromFavoritesEvent(this.item);
 }
 
-class FavoritesLoadedEvent extends FavoritesEvent {
-  FavoritesLoadedEvent(List<ResultModel>? favorites);
+class FavoritesLoadEvent extends FavoritesEvent {
+  FavoritesLoadEvent();
 }
 
 class LoadFavoritesForUserEvent extends FavoritesEvent {

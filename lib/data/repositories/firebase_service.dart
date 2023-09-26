@@ -7,6 +7,7 @@ class FireBaseService {
     final UserCredential userCredential = await _firebase
         .createUserWithEmailAndPassword(email: email, password: password);
     User? user = userCredential.user;
+    print(user);
     return user;
   }
 

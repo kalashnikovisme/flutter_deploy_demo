@@ -57,8 +57,8 @@ class MyApp extends StatelessWidget {
           BlocProvider<ConnectionCubit>(
             create: (context) => ConnectionCubit(),
           ),
-          BlocProvider<FavoritesBloc>.value(
-            value: favoritesBloc,
+          BlocProvider<FavoritesBloc>(
+            create:  (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider<ErrorBloc>(
             create: (context) => ErrorBloc(),

@@ -9,7 +9,7 @@ import 'package:test_intern/domain/models/result_model.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
-
+import 'package:collection/collection.dart';
 class ImageGridWidget extends StatefulWidget {
   final ResultModel resultModel;
 
@@ -27,16 +27,12 @@ class _ImageGridWidgetState extends State<ImageGridWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final favoritesBloc = context.read<FavoritesBloc>();
-    print('object');
+    print(widget.resultModel.id.toString() + widget.resultModel.name! + 'AAAAAAAAAAA');
     return BlocBuilder<FavoritesBloc, FavoritesState>(
-      bloc: favoritesBloc,
       builder: (context, state) {
-        print('here');
+        print(state.favoriteItems.map((e) => e.name! + e.id.toString()));
         final isItemInFavorites =
-            state.favoriteItems.contains(widget.resultModel);
-
-        print("ну че?");
+            state.favoriteItems.firstWhereOrNull((e) => e.id == widget.resultModel.id ) != null;
         print(isItemInFavorites);
 
         return Padding(

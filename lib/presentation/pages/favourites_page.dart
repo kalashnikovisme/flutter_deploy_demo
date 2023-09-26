@@ -18,20 +18,15 @@ class FavouritesPage extends StatefulWidget {
 }
 
 class _FavouritesPageState extends State<FavouritesPage> {
-  late FavoritesBloc favoritesBloc;
+
 
   @override
   void initState() {
     super.initState();
-    favoritesBloc = context.read<FavoritesBloc>();
-    _loadFavoritesData();
+    context.read<FavoritesBloc>().add(FavoritesLoadEvent());
   }
 
-  Future<void> _loadFavoritesData() async {
-    final favorites =
-        await SQLService().getFavoriteCharacters(widget.userEmail);
-    favoritesBloc.add(FavoritesLoadedEvent(favorites));
-  }
+
 
   @override
   Widget build(BuildContext context) {

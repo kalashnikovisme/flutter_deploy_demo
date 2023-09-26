@@ -5,7 +5,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
 import 'package:test_intern/presentation/pages/widget/no_internet_widget.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
@@ -19,6 +19,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String emailErrorText = '';
   String passwordErrorText = '';
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,13 +91,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          print('presse auth user');
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
                                 RegisterEvent(email: email, password: password),
                               );
+
                         },
-                        child: const Text('Зарегистрироваться'),
+                        child:  Text(AppLocalizations.of(context)
+                            ?.registerString ??
+                            ''),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -101,7 +111,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 SignInEvent(email: email, password: password),
                               );
                         },
-                        child: const Text('Войти'),
+                        child:  Text(AppLocalizations.of(context)
+                            ?.signInString ??
+                            ''),
                       ),
                     ],
                   ),

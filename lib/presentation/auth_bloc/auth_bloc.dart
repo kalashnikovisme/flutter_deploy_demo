@@ -32,6 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user != null) {
           final String? token = await user.getIdToken();
           await sQlService.saveToken(token ?? '');
+          print('presse auth user');
           emit(AuthAuthenticated(user));
         } else {
           emit(const AuthErrorState("User registration failed."));

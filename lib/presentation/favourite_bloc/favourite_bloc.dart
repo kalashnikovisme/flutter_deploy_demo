@@ -15,12 +15,14 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         )) {
     on<AddToFavoritesEvent>(_onAddToFavorites);
     on<RemoveFromFavoritesEvent>(_onRemoveFromFavorites);
-    on<FavoritesLoadedEvent>(_onLoadFavsList);
+    on<FavoritesLoadEvent>(_onLoadFavsList);
   }
 
   void _onLoadFavsList(
-      FavoritesLoadedEvent event, Emitter<FavoritesState> emit) async {
+      FavoritesLoadEvent event, Emitter<FavoritesState> emit) async {
     final albumsList = await service.getFavoriteCharacters(userEmail);
+    print('load event favs');
+    print(albumsList?.map((e) => e.id));
     emit(FavoritesState(
         favoriteItems: albumsList ?? [],
         isFavourite: true,
@@ -65,6 +67,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       isFavourite: false,
     ));
 
+    print('delete before await');
     await service.delete(event.item, userEmail);
   }
 }
