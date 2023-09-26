@@ -6,6 +6,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
 import 'package:test_intern/presentation/pages/widget/no_internet_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
@@ -25,11 +26,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     passwordController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Вход'),
+        title: Text(AppLocalizations.of(context)?.enter ?? ''),
         actions: const [
           NoInternetBanner(),
         ],
@@ -79,7 +81,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   TextFormField(
                     controller: passwordController,
                     decoration: InputDecoration(
-                      labelText: 'Пароль',
+                      labelText:
+                          AppLocalizations.of(context)?.passwordString ?? '',
                       errorText: passwordErrorText.isNotEmpty
                           ? passwordErrorText
                           : null,
@@ -91,17 +94,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          print('presse auth user');
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
                                 RegisterEvent(email: email, password: password),
                               );
-
                         },
-                        child:  Text(AppLocalizations.of(context)
-                            ?.registerString ??
-                            ''),
+                        child: Text(
+                            AppLocalizations.of(context)?.registerString ?? ''),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -111,9 +111,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 SignInEvent(email: email, password: password),
                               );
                         },
-                        child:  Text(AppLocalizations.of(context)
-                            ?.signInString ??
-                            ''),
+                        child: Text(
+                            AppLocalizations.of(context)?.signInString ?? ''),
                       ),
                     ],
                   ),

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 const String emailAlreadyInUse = 'email-already-in-use';
 const String userNotFound = 'ERROR_USER_NOT_FOUND';
@@ -17,4 +18,8 @@ extension FirebaseAuthExceptionExtension on FirebaseAuthException {
         return 'An error occurred during authentication.';
     }
   }
+}
+
+void logErrorToCrashlytics(error, stackTrace) {
+  FirebaseCrashlytics.instance.recordError(error, stackTrace);
 }

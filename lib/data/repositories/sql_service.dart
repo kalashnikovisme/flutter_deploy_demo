@@ -4,7 +4,6 @@ import 'package:test_intern/data/dtos/result.dart';
 import 'package:test_intern/data/mappers/rick_and_morty_mapper.dart';
 import 'package:test_intern/domain/models/result_model.dart';
 
-
 class SQLService {
   Database? _db;
 
@@ -21,7 +20,7 @@ class SQLService {
   Future<Database> initDB() async {
     final String dbPath =
         path.join(await getDatabasesPath(), "user_database.db");
-    final charDB = await openDatabase(dbPath, version: 4, onCreate: _createDB);
+    final charDB = await openDatabase(dbPath, version: 6, onCreate: _createDB);
     return charDB;
   }
 
@@ -53,29 +52,23 @@ class SQLService {
     final db = await this.db;
 
     final user = await db?.query(
-      'User',
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
-    ) ?? [];
+          'User',
+          where: 'userEmail = ?',
+          whereArgs: [userEmail],
+        ) ??
+        [];
 
-    if(user.isEmpty){
-      print('user is not found');
+    if (user.isEmpty) {
       return [];
     }
 
     final result = await db?.rawQuery('''
-    SELECT *
-    FROM characters
-    LEFT JOIN user_characters ON characters.id = user_characters.character_id
-      AND user_characters.user_id = ?
+    SELECT * FROM characters WHERE id IN
+    (SELECT character_id FROM user_characters WHERE user_id = ?)
   ''', [user[0]['id']]);
 
-    print(result?.map((e) => e));
-    print(userEmail);
     return result?.map((map) {
-      return ResultDto.fromJson(
-          map
-         ).toDomain();
+      return ResultDto.fromJson(map).toDomain();
     }).toList();
   }
 
@@ -83,66 +76,60 @@ class SQLService {
     final db = await this.db;
 
     final user = await db?.query(
-      'User',
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
-    ) ?? [];
+          'User',
+          where: 'userEmail = ?',
+          whereArgs: [userEmail],
+        ) ??
+        [];
 
-    if(user.isEmpty){
-      print('user is not found');
+    if (user.isEmpty) {
       return;
     }
 
-      print('вот тут чекаем есть ли такой перс, чтобы не было дублей');
-      final isCharacterLiked = await db?.query(
+    final isCharacterLiked = await db?.query(
+      'user_characters',
+      where: 'user_id = ? AND character_id = ?',
+      whereArgs: [user[0]['id'], character.id],
+    );
+
+    if (isCharacterLiked != null && isCharacterLiked.isNotEmpty) {
+    } else {
+      await db?.insert(
         'user_characters',
-        where: 'user_id = ? AND character_id = ?',
-        whereArgs: [user[0]['id'], character.id],
+        {
+          'user_id': user[0]['id'],
+          'character_id': character.id,
+        },
       );
-
-      if (isCharacterLiked != null && isCharacterLiked.isNotEmpty) {
-        print('уже в избранном, угомонись, не дублируется');
-      } else {
-        await db?.insert(
-          'user_characters',
-          {
-            'user_id': user[0]['id'],
-            'character_id': character.id,
-          },
-        );
-      }
     }
-
+  }
 
   Future<void> delete(ResultModel character, String userEmail) async {
     final db = await this.db;
 
-    print('local db');
-    print((await db?.query("user_characters"))?.map((e) => (e['user_id']?? '').toString()  + ' ' + (e['character_id']?? '').toString()));
     final user = await db?.query(
-      'User',
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
-    ) ?? [];
-    if(user.isEmpty){
-      print('user is not found');
+          'User',
+          where: 'userEmail = ?',
+          whereArgs: [userEmail],
+        ) ??
+        [];
+    if (user.isEmpty) {
       return;
     }
 
-
-      print('вообще совсем удаляем связь (!!!!) из таблицы');
-      await db?.delete(
-        'user_characters',
-        where: 'user_id = ? AND character_id = ?',
-        whereArgs:  [user[0]['id'], character.id],
-      );
-    }
+    await db?.delete(
+      'user_characters',
+      where: 'user_id = ? AND character_id = ?',
+      whereArgs: [user[0]['id'], character.id],
+    );
+  }
 
   Future<void> saveToken(String email) async {
     final db = await this.db;
-    await db?.rawInsert(
-      'INSERT INTO User (userEmail) VALUES(?)',
-      [email],
+    await db?.insert(
+      'User',
+      {'userEmail': email},
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 

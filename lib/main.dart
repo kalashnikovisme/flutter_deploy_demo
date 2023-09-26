@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
@@ -15,12 +16,10 @@ import 'package:test_intern/presentation/localization_bloc/localization_state.da
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:test_intern/presentation/pages/enter_page.dart';
 
-import 'data/repositories/sql_service.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await SQLService().initDB();
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(const MyApp());
 }
 
@@ -30,8 +29,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-    final favoritesBloc = FavoritesBloc(userEmail);
-
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -58,7 +55,7 @@ class MyApp extends StatelessWidget {
             create: (context) => ConnectionCubit(),
           ),
           BlocProvider<FavoritesBloc>(
-            create:  (context) => FavoritesBloc(userEmail),
+            create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider<ErrorBloc>(
             create: (context) => ErrorBloc(),
@@ -79,7 +76,7 @@ class MyApp extends StatelessWidget {
                       ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                   useMaterial3: true,
                 ),
-                home: EnterPage(),
+                home: const EnterPage(),
               );
             },
           ),

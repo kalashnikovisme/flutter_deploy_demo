@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/pages/auth_page.dart';
 import 'package:test_intern/root_screen.dart';
-
-import '../../main.dart';
 
 class EnterPage extends StatefulWidget {
   const EnterPage({super.key});
@@ -14,7 +11,7 @@ class EnterPage extends StatefulWidget {
 }
 
 class _EnterPageState extends State<EnterPage> {
-  bool? userAuth;
+  bool userAuth = false;
 
   @override
   void initState() {
@@ -22,17 +19,12 @@ class _EnterPageState extends State<EnterPage> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (mounted) {
         if (user == null) {
-          if (userAuth != false) {
-            setState(() {
-              userAuth = false;
-            });
+          if (userAuth) {
+            setState(() => userAuth = false);
           }
         } else {
-          if (userAuth != true) {
-            await SQLService().saveToken(user.email ?? '');
-            setState(() {
-              userAuth = true;
-            });
+          if (userAuth == false) {
+            setState(() => userAuth = true);
           }
         }
       }
@@ -41,6 +33,6 @@ class _EnterPageState extends State<EnterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return (userAuth ?? false) ? RootScreen() : const RegistrationScreen();
+    return userAuth ? const RootScreen() : const RegistrationScreen();
   }
 }

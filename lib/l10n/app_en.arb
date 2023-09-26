@@ -12,5 +12,6 @@
   "favourites": "Favourites",
   "emptyFavs": "List of favourites is empty",
   "dataCache": "Data loaded from cache",
-  "dataApi": "Data loaded from network"
+  "dataApi": "Data loaded from network",
+  "enter": "Sign up page"
 }

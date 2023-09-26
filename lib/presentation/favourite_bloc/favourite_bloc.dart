@@ -21,16 +21,11 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
   void _onLoadFavsList(
       FavoritesLoadEvent event, Emitter<FavoritesState> emit) async {
     final albumsList = await service.getFavoriteCharacters(userEmail);
-    print('load event favs');
-    print(albumsList?.map((e) => e.id));
     emit(FavoritesState(
         favoriteItems: albumsList ?? [],
         isFavourite: true,
         isLoading: false,
         email: userEmail));
-
-    print('from bloc');
-    print(albumsList);
   }
 
   void _onAddToFavorites(
@@ -54,11 +49,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
   void _onRemoveFromFavorites(
       RemoveFromFavoritesEvent event, Emitter<FavoritesState> emit) async {
     final updatedFavorites = List.of(state.favoriteItems);
-    updatedFavorites.remove(event.item);
-
-    if (updatedFavorites.contains(event.item)) {
-      updatedFavorites.remove(event.item);
-    }
+    updatedFavorites.removeWhere((e) => e.id == event.item.id);
 
     emit(FavoritesState(
       favoriteItems: updatedFavorites,
@@ -67,7 +58,6 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       isFavourite: false,
     ));
 
-    print('delete before await');
     await service.delete(event.item, userEmail);
   }
 }

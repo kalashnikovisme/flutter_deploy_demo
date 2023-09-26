@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/components/color_style.dart';
 import 'package:test_intern/components/text_styles.dart';
-import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
@@ -38,7 +37,6 @@ class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController controller = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
@@ -58,13 +56,13 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
     controller.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {

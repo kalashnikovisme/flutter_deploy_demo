@@ -5,8 +5,6 @@ import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../data/repositories/sql_service.dart';
-
 class FavouritesPage extends StatefulWidget {
   final String userEmail;
   const FavouritesPage({
@@ -18,20 +16,15 @@ class FavouritesPage extends StatefulWidget {
 }
 
 class _FavouritesPageState extends State<FavouritesPage> {
-
-
   @override
   void initState() {
     super.initState();
     context.read<FavoritesBloc>().add(FavoritesLoadEvent());
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final favoritesBloc = context.read<FavoritesBloc>();
-    print(favoritesBloc.state);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.favourites ?? ''),

@@ -13,16 +13,16 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
   final SQLService service = SQLService();
   HomeBloc(this.apiService)
       : super(const PagState(
-            page: 1,
-            count: 20,
-            result: [],
-            isLoading: false,
-            search: '',
-            next: '',
-            isCached: false,
-            connection: false,
-            isFavourite: false,
-            favoriteItems: [])) {
+          page: 1,
+          count: 20,
+          result: [],
+          isLoading: false,
+          search: '',
+          next: '',
+          isCached: false,
+          connection: false,
+          isFavourite: false,
+        )) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
     on<UpdateCountEvent>(_onUpdateCount);
@@ -111,16 +111,16 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     final remoteResults = await apiService.fetchNameSearch(event.name);
     emit(
       PagState(
-          result: remoteResults.results ?? [],
-          page: 1,
-          count: remoteResults.results?.length ?? 0,
-          isLoading: false,
-          search: event.name,
-          next: '',
-          isCached: false,
-          connection: false,
-          isFavourite: false,
-          favoriteItems: const []),
+        result: remoteResults.results ?? [],
+        page: 1,
+        count: remoteResults.results?.length ?? 0,
+        isLoading: false,
+        search: event.name,
+        next: '',
+        isCached: false,
+        connection: false,
+        isFavourite: false,
+      ),
     );
   }
 
@@ -138,7 +138,6 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         isCached: false,
         connection: false,
         isFavourite: false,
-        favoriteItems: const [],
       ),
     );
   }

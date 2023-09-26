@@ -30,16 +30,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user =
             await fireBaseService.registerUser(event.email, event.password);
         if (user != null) {
-          final String? token = await user.getIdToken();
-          await sQlService.saveToken(token ?? '');
-          print('presse auth user');
+          await sQlService.saveToken(user.email ?? '');
           emit(AuthAuthenticated(user));
         } else {
           emit(const AuthErrorState("User registration failed."));
         }
       }
     } on FirebaseAuthException catch (e, s) {
-      //FirebaseCrashlytics.instance.recordError(e, s);
+      logErrorToCrashlytics(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }
@@ -51,10 +49,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.signInUser(event.email, event.password);
-        emit(AuthAuthenticated(user!));
+        if (user != null) {
+          await sQlService.saveToken(event.email);
+          emit(AuthAuthenticated(user));
+        }
       }
     } on FirebaseAuthException catch (e, s) {
-      // FirebaseCrashlytics.instance.recordError(e, s);
+      logErrorToCrashlytics(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }
