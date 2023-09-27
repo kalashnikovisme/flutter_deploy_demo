@@ -9,6 +9,7 @@ import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.d
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/error_bloc/error_state.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
@@ -21,10 +22,9 @@ import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../favourite_bloc/favourite_bloc.dart';
-
 class HomePage extends StatefulWidget {
   final String email;
+
   const HomePage({
     Key? key,
     required this.email,

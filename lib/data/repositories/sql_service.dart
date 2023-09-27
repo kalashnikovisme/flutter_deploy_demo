@@ -7,6 +7,10 @@ import 'package:test_intern/domain/models/result_model.dart';
 class SQLService {
   Database? _db;
 
+  static const String userDb = 'User';
+  static const String charactersDb = 'characters';
+  static const String characterUserDb = 'user_characters';
+
   Future<Database?> get db async {
     if (_db == null) {
       _db = await initDB();
@@ -26,20 +30,20 @@ class SQLService {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-    CREATE TABLE User (
+    CREATE TABLE $userDb (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       userEmail TEXT
     )
   ''');
 
     await db.execute('''
-    CREATE TABLE characters (
+    CREATE TABLE $charactersDb (
       id INTEGER PRIMARY KEY,
       name TEXT,
       image BLOB
     )
   ''');
-    await db.execute('''CREATE TABLE user_characters (
+    await db.execute('''CREATE TABLE $characterUserDb (
   id INTEGER PRIMARY KEY,
   user_id INTEGER,
   character_id INTEGER,
@@ -52,7 +56,7 @@ class SQLService {
     final db = await this.db;
 
     final user = await db?.query(
-          'User',
+          userDb,
           where: 'userEmail = ?',
           whereArgs: [userEmail],
         ) ??
@@ -63,7 +67,7 @@ class SQLService {
     }
 
     final result = await db?.rawQuery('''
-    SELECT * FROM characters WHERE id IN
+    SELECT * FROM $charactersDb WHERE id IN
     (SELECT character_id FROM user_characters WHERE user_id = ?)
   ''', [user[0]['id']]);
 
@@ -75,19 +79,14 @@ class SQLService {
   Future<void> saveToFavourite(ResultModel character, String userEmail) async {
     final db = await this.db;
 
-    final user = await db?.query(
-          'User',
-          where: 'userEmail = ?',
-          whereArgs: [userEmail],
-        ) ??
-        [];
+    final user = await _fetchDB(userEmail);
 
     if (user.isEmpty) {
       return;
     }
 
     final isCharacterLiked = await db?.query(
-      'user_characters',
+      characterUserDb,
       where: 'user_id = ? AND character_id = ?',
       whereArgs: [user[0]['id'], character.id],
     );
@@ -95,7 +94,7 @@ class SQLService {
     if (isCharacterLiked != null && isCharacterLiked.isNotEmpty) {
     } else {
       await db?.insert(
-        'user_characters',
+        characterUserDb,
         {
           'user_id': user[0]['id'],
           'character_id': character.id,
@@ -104,21 +103,28 @@ class SQLService {
     }
   }
 
+  Future<List<Map<String, Object?>>> _fetchDB(String userEmail) async {
+    final db = await this.db;
+    final results = await db?.query(
+      userDb,
+      where: 'userEmail = ?',
+      whereArgs: [userEmail],
+    );
+
+    return results ?? [];
+  }
+
   Future<void> delete(ResultModel character, String userEmail) async {
     final db = await this.db;
 
-    final user = await db?.query(
-          'User',
-          where: 'userEmail = ?',
-          whereArgs: [userEmail],
-        ) ??
-        [];
+    final user = await _fetchDB(userEmail);
+
     if (user.isEmpty) {
       return;
     }
 
     await db?.delete(
-      'user_characters',
+      characterUserDb,
       where: 'user_id = ? AND character_id = ?',
       whereArgs: [user[0]['id'], character.id],
     );
@@ -127,7 +133,7 @@ class SQLService {
   Future<void> saveToken(String email) async {
     final db = await this.db;
     await db?.insert(
-      'User',
+      userDb,
       {'userEmail': email},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -137,7 +143,7 @@ class SQLService {
     final db = await this.db;
     for (final char in character ?? []) {
       await db?.insert(
-        'characters',
+        charactersDb,
         {
           'id': char.id,
           'name': char.name,
@@ -150,13 +156,9 @@ class SQLService {
 
   Future<List<ResultModel>?> getCachedList() async {
     final db = await this.db;
-    final result = await db?.query("characters");
+    final result = await db?.query(charactersDb);
     return result?.map((map) {
-      return ResultModel(
-        id: map['id'] as int,
-        name: map['name'] as String,
-        image: map['image'] as String,
-      );
+      return ResultDto.fromJson(map).toDomain();
     }).toList();
   }
 

@@ -75,11 +75,10 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     await service.insertPaginatedList(newData.results);
     emit(
       state.copyWith(
-        result: updatedData,
-        page: nextPage,
-        next: newData.info?.next ?? '',
-        isCached: false
-      ),
+          result: updatedData,
+          page: nextPage,
+          next: newData.info?.next ?? '',
+          isCached: false),
     );
   }
 

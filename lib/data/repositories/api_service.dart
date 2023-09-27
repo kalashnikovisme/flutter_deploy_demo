@@ -7,6 +7,7 @@ import 'package:test_intern/domain/models/rick_and_morty_model.dart';
 class ApiService {
   static final Dio _dio = Dio();
   static const String _baseUrl = "https://rickandmortyapi.com/api";
+  static const messageException = 'Failed to fetch Rich and Morty';
 
   final Function(String) errorHandler;
 
@@ -27,7 +28,7 @@ class ApiService {
     } on DioException catch (e) {
       errorHandler(e.response?.statusCode.toString() ?? '');
     }
-    throw Exception('Failed to fetch Rick and Morty characters.');
+    throw Exception(messageException);
   }
 
   Future<RickAndMortyModel> fetchNameSearch(String name) async {

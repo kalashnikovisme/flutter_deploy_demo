@@ -9,6 +9,7 @@
   "registerString": "Sign up",
   "signInString": "Sign in",
   "passwordString": "Password",
+  "stringEmail": "Email",
   "favourites": "Favourites",
   "emptyFavs": "List of favourites is empty",
   "dataCache": "Cache",

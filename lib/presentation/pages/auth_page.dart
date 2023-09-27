@@ -72,7 +72,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText:
+                          AppLocalizations.of(context)?.stringEmail ?? '',
                       errorText:
                           emailErrorText.isNotEmpty ? emailErrorText : null,
                     ),

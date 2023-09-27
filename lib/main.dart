@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +8,6 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
-import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
-import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -28,7 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -48,14 +44,8 @@ class MyApp extends StatelessWidget {
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(),
           ),
-          BlocProvider<HomeBloc>(
-            create: (context) => HomeBloc(context.read<ApiService>()),
-          ),
           BlocProvider<ConnectionCubit>(
             create: (context) => ConnectionCubit(),
-          ),
-          BlocProvider<FavoritesBloc>(
-            create: (context) => FavoritesBloc(userEmail),
           ),
           BlocProvider<ErrorBloc>(
             create: (context) => ErrorBloc(),
@@ -66,6 +56,7 @@ class MyApp extends StatelessWidget {
           child: BlocBuilder<LanguageBloc, LanguageState>(
             builder: (context, state) {
               return MaterialApp(
+                debugShowCheckedModeBanner: false,
                 locale: Locale(state.locale.first.languageCode,
                     state.locale.last.languageCode),
                 supportedLocales: L10N.supportedLanguage,

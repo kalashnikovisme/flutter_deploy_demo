@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/sql_service.dart';
 import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
@@ -5,8 +6,8 @@ import 'package:test_intern/presentation/favourite_bloc/favourite_state.dart';
 
 class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
   final SQLService service = SQLService();
-  String userEmail;
-  FavoritesBloc(this.userEmail)
+  final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+  FavoritesBloc()
       : super(const FavoritesState(
           favoriteItems: [],
           isFavourite: false,
