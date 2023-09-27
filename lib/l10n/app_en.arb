@@ -11,7 +11,7 @@
   "passwordString": "Password",
   "favourites": "Favourites",
   "emptyFavs": "List of favourites is empty",
-  "dataCache": "Data loaded from cache",
-  "dataApi": "Data loaded from network",
+  "dataCache": "Cache",
+  "dataApi": "Network",
   "enter": "Sign up page"
 }

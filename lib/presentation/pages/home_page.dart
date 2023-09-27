@@ -14,6 +14,7 @@ import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
 import 'package:test_intern/presentation/pages/favourites_page.dart';
+import 'package:test_intern/presentation/pages/widget/cache_icon_widget.dart';
 import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
 import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
@@ -69,6 +70,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: const [
+          CachedDataIcon(),
           LanguageSwitcher(),
         ],
         leading: IconButton(
@@ -120,39 +122,6 @@ class _HomePageState extends State<HomePage> {
                                   final item = state.result[index];
                                   return ImageGridWidget(
                                     resultModel: item,
-                                  );
-                                }
-                                if (state.next.isEmpty) {
-                                  return Center(
-                                    child: Text(
-                                      AppLocalizations.of(context)
-                                              ?.allDataLoadedString ??
-                                          '',
-                                      style: TextsStyles.allDataLoadedString,
-                                    ),
-                                  );
-                                }
-                                if (state.isCached) {
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                    (_) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          backgroundColor: state.isCached
-                                              ? Colors.red
-                                              : Colors.green,
-                                          content: state.isCached
-                                              ? Text(
-                                                  AppLocalizations.of(context)
-                                                          ?.dataApi ??
-                                                      '')
-                                              : Text(
-                                                  AppLocalizations.of(context)
-                                                          ?.dataCache ??
-                                                      ''),
-                                        ),
-                                      );
-                                    },
                                   );
                                 }
                                 return const Center(

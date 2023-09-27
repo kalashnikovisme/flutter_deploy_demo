@@ -8,7 +8,7 @@ class PagState extends Equatable {
 
   final int count;
 
-  final String next;
+  final String? next;
 
   final bool isLoading;
 
@@ -17,8 +17,6 @@ class PagState extends Equatable {
   final bool isCached;
 
   final bool connection;
-
-  final bool isFavourite;
 
   const PagState({
     required this.result,
@@ -29,7 +27,6 @@ class PagState extends Equatable {
     required this.search,
     required this.isCached,
     required this.connection,
-    required this.isFavourite,
   });
 
   PagState copyWith({
@@ -41,7 +38,6 @@ class PagState extends Equatable {
     String? search,
     bool? isCached,
     bool? connection,
-    bool? isFavourite,
   }) =>
       PagState(
         result: result ?? this.result,
@@ -52,7 +48,6 @@ class PagState extends Equatable {
         next: next ?? this.next,
         isCached: isCached ?? this.isCached,
         connection: connection ?? this.connection,
-        isFavourite: isFavourite ?? this.isFavourite,
       );
 
   @override

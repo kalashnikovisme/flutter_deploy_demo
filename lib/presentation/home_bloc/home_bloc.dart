@@ -18,10 +18,9 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
           result: [],
           isLoading: false,
           search: '',
-          next: '',
+          next: null,
           isCached: false,
           connection: false,
-          isFavourite: false,
         )) {
     on<LoadListEvent>(_onLoadData);
     on<LoadNextPageEvent>(_onLoadNextPage);
@@ -60,16 +59,26 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
   }
 
   void _onLoadNextPage(LoadNextPageEvent event, Emitter<PagState> emit) async {
+    if (state.next == '') {
+      return;
+    }
+
     final nextPage = state.page + 1;
     final newData = await apiService.getResult(nextPage, state.count);
-    final updatedData = List.of(state.result)
-      ..addAll(newData.results?.toList() ?? []);
+
+    if (newData.results?.isEmpty ?? true) {
+      emit(state.copyWith(next: ''));
+      return;
+    }
+
+    final updatedData = List.of(state.result)..addAll(newData.results ?? []);
+    await service.insertPaginatedList(newData.results);
     emit(
       state.copyWith(
-        result: updatedData,
-        page: nextPage,
-        next: newData.info?.next ?? '',
-      ),
+          result: updatedData,
+          page: nextPage,
+          next: newData.info?.next ?? '',
+          isCached: false),
     );
   }
 
@@ -88,10 +97,10 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
     final newData = await apiService.getResult(initialPage, initialCount);
     emit(
       state.copyWith(
-        result: newData.results,
-        page: initialPage,
-        count: initialCount,
-      ),
+          result: newData.results,
+          page: initialPage,
+          count: initialCount,
+          next: newData.info?.next ?? ''),
     );
   }
 
@@ -119,7 +128,6 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         next: '',
         isCached: false,
         connection: false,
-        isFavourite: false,
       ),
     );
   }
@@ -137,7 +145,6 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         next: newData.info?.next ?? '',
         isCached: false,
         connection: false,
-        isFavourite: false,
       ),
     );
   }
