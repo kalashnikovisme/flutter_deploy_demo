@@ -78,6 +78,7 @@ class HomeBloc extends Bloc<PagEvent, PagState> {
         result: updatedData,
         page: nextPage,
         next: newData.info?.next ?? '',
+        isCached: false
       ),
     );
   }
