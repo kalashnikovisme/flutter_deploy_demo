@@ -9,6 +9,7 @@
   "registerString": "Зарегистрироваться",
   "signInString": "Войти",
   "passwordString": "Пароль",
+  "stringEmail": "Е-мэйл",
   "favourites": "Избранное",
   "emptyFavs": "Список избранного пуст",
   "dataCache": "Данные из кэша",

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
@@ -13,8 +12,6 @@ class RootScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
-
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -32,7 +29,7 @@ class RootScreen extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => FavoritesBloc(userEmail),
+            create: (context) => FavoritesBloc(),
           ),
           BlocProvider(
             create: (context) => HomeBloc(
@@ -42,11 +39,7 @@ class RootScreen extends StatelessWidget {
         ],
         child: Navigator(
           onGenerateRoute: (RouteSettings settings) {
-            WidgetBuilder builder;
-            switch (settings.name) {
-              default:
-                builder = (BuildContext _) => HomePage(email: userEmail);
-            }
+            builder(BuildContext _) => const HomePage(email: '');
             return MaterialPageRoute(builder: builder, settings: settings);
           },
         ),

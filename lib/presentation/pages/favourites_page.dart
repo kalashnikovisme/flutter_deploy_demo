@@ -7,7 +7,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FavouritesPage extends StatefulWidget {
   final String userEmail;
+
   const FavouritesPage({
+    super.key,
     required this.userEmail,
   });
 

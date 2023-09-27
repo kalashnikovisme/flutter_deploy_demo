@@ -6,14 +6,14 @@ class FireBaseService {
   Future<User?> registerUser(String email, String password) async {
     final UserCredential userCredential = await _firebase
         .createUserWithEmailAndPassword(email: email, password: password);
-    User? user = userCredential.user;
+    final User? user = userCredential.user;
     return user;
   }
 
   Future<User?> signInUser(String email, String password) async {
     final UserCredential userCredential = await _firebase
         .signInWithEmailAndPassword(email: email, password: password);
-    User? user = userCredential.user;
+    final User? user = userCredential.user;
     return user;
   }
 

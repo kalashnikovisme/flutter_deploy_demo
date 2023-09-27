@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 class ErrorInterceptor extends Interceptor {
   ErrorInterceptor(this.errorHandler);
 
-  final Function(String) errorHandler;
+  final Function(String s) errorHandler;
 
   @override
   Future<void> onError(
