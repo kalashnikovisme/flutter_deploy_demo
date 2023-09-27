@@ -9,20 +9,26 @@ import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.d
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
 import 'package:test_intern/presentation/error_bloc/error_state.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_event.dart';
 import 'package:test_intern/presentation/home_bloc/home_state.dart';
-import 'package:test_intern/presentation/pages/auth_page.dart';
+import 'package:test_intern/presentation/pages/favourites_page.dart';
+import 'package:test_intern/presentation/pages/widget/cache_icon_widget.dart';
 import 'package:test_intern/presentation/pages/widget/error_text_widget.dart';
 import 'package:test_intern/presentation/pages/widget/image_grid_widget.dart';
 import 'package:test_intern/presentation/pages/widget/language_switcher.dart';
 import 'package:test_intern/presentation/pages/widget/text_field_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../favourite_bloc/favourite_bloc.dart';
+
 class HomePage extends StatefulWidget {
   final String email;
-
-  const HomePage({Key? key, required this.email}) : super(key: key);
+  const HomePage({
+    Key? key,
+    required this.email,
+  }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -35,16 +41,28 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
-    final connectionCubit = context.read<ConnectionCubit>();
-    connectionCubit.stream.listen((connectionState) {
-      if (connectionState.result == ConnectivityResult.mobile ||
-          connectionState.result == ConnectivityResult.wifi ||
-          connectionState.result == ConnectivityResult.none) {
-        BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
-        BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
-      }
-    });
+    if (mounted) {
+      BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+      context.read<FavoritesBloc>().add(FavoritesLoadEvent());
+      final connectionCubit = context.read<ConnectionCubit>();
+      connectionCubit.stream.listen((connectionState) {
+        if (mounted) {
+          if (connectionState.result == ConnectivityResult.mobile ||
+              connectionState.result == ConnectivityResult.wifi ||
+              connectionState.result == ConnectivityResult.none) {
+            BlocProvider.of<ErrorBloc>(context).add(ClearErrorEvent());
+            BlocProvider.of<HomeBloc>(context).add(LoadListEvent());
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,8 +70,21 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: const [
+          CachedDataIcon(),
           LanguageSwitcher(),
         ],
+        leading: IconButton(
+          icon: const Icon(Icons.favorite),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => FavouritesPage(
+                  userEmail: widget.email,
+                ),
+              ),
+            );
+          },
+        ),
       ),
       body: BlocBuilder<ErrorBloc, ErrorState>(
         builder: (context, errorState) {
@@ -88,12 +119,12 @@ class _HomePageState extends State<HomePage> {
                               itemCount: state.result.length + 1,
                               itemBuilder: (context, index) {
                                 if (index < state.result.length) {
+                                  final item = state.result[index];
                                   return ImageGridWidget(
-                                    imageUrl: state.result[index].image ?? '',
-                                    nameCard: state.result[index].name ?? '',
+                                    resultModel: item,
                                   );
                                 }
-                                if (state.next.isEmpty) {
+                                if (state.next?.isEmpty ?? false) {
                                   return Center(
                                     child: Text(
                                       AppLocalizations.of(context)
@@ -103,6 +134,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   );
                                 }
+
                                 return const Center(
                                   child: CircularProgressIndicator(),
                                 );
@@ -159,13 +191,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               onPressed: () {
                 context.read<AuthBloc>().add(SignOutEvent());
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegistrationScreen(),
-                  ),
-                  (route) => false,
-                );
+                Navigator.of(context).pop();
               },
               child: Text(
                 AppLocalizations.of(context)?.yes ?? '',

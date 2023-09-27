@@ -28,3 +28,7 @@ class AuthErrorState extends AuthState {
 
   const AuthErrorState(this.errorMessage);
 }
+
+class ClearUser extends AuthState {
+  const ClearUser();
+}

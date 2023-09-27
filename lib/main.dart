@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_intern/data/repositories/api_service.dart';
@@ -7,6 +9,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/connectivity_cubit/connectivity_cubit.dart';
 import 'package:test_intern/presentation/error_bloc/error_bloc.dart';
 import 'package:test_intern/presentation/error_bloc/error_event.dart';
+import 'package:test_intern/presentation/favourite_bloc/favourite_bloc.dart';
 import 'package:test_intern/presentation/home_bloc/home_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_bloc.dart';
 import 'package:test_intern/presentation/localization_bloc/localization_state.dart';
@@ -16,14 +19,16 @@ import 'package:test_intern/presentation/pages/enter_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? '';
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<ApiService>(
@@ -46,24 +51,14 @@ class MyApp extends StatelessWidget {
           BlocProvider<HomeBloc>(
             create: (context) => HomeBloc(context.read<ApiService>()),
           ),
-          BlocProvider(
+          BlocProvider<ConnectionCubit>(
             create: (context) => ConnectionCubit(),
           ),
+          BlocProvider<FavoritesBloc>(
+            create: (context) => FavoritesBloc(userEmail),
+          ),
           BlocProvider<ErrorBloc>(
-            lazy: false,
             create: (context) => ErrorBloc(),
-            child: RepositoryProvider<ApiService>(
-              lazy: true,
-              create: (context) => ApiService(
-                errorHandler: (String message) {
-                  context.read<ErrorBloc>().add(
-                        ShowErrorEvent(
-                          message: message,
-                        ),
-                      );
-                },
-              ),
-            ),
           ),
         ],
         child: BlocProvider(

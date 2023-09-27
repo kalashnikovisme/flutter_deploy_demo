@@ -8,5 +8,10 @@
   "no": "No",
   "registerString": "Sign up",
   "signInString": "Sign in",
-  "passwordString": "Password"
+  "passwordString": "Password",
+  "favourites": "Favourites",
+  "emptyFavs": "List of favourites is empty",
+  "dataCache": "Cache",
+  "dataApi": "Network",
+  "enter": "Sign up page"
 }

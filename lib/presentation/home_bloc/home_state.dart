@@ -8,7 +8,7 @@ class PagState extends Equatable {
 
   final int count;
 
-  final String next;
+  final String? next;
 
   final bool isLoading;
 

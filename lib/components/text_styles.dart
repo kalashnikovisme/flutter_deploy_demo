@@ -31,4 +31,9 @@ class TextsStyles {
     color: ColorStyle.nameCardColor,
   );
 
+  static const TextStyle textNetworkorCache = TextStyle(
+    fontWeight: FontWeight.w900,
+    fontSize: 16,
+    color: Colors.black87,
+  );
 }

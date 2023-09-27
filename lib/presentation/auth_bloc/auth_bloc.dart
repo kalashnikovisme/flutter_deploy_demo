@@ -16,26 +16,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_registerUser);
     on<SignInEvent>(_signIn);
     on<SignOutEvent>(_signOut);
-    on<CheckAuthorizationEvent>(_checkAuthorization);
   }
 
   bool _isEmailAndPasswordEmpty(String email, String password) {
     return email.isEmpty || password.isEmpty;
-  }
-
-  void _checkAuthorization(
-      CheckAuthorizationEvent event, Emitter<AuthState> emit) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        emit(const CheckAuth(null, false));
-      } else {
-        final tokenExists = await sQlService.isTokenExist();
-        emit(CheckAuth(user, tokenExists));
-      }
-    } on FirebaseAuthException catch (e) {
-      emit(AuthErrorState(e.getErrorMessage()));
-    }
   }
 
   void _registerUser(RegisterEvent event, Emitter<AuthState> emit) async {
@@ -46,14 +30,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user =
             await fireBaseService.registerUser(event.email, event.password);
         if (user != null) {
-          final String? token = await user.getIdToken();
-          await sQlService.saveToken(token ?? '');
+          await sQlService.saveToken(user.email ?? '');
           emit(AuthAuthenticated(user));
         } else {
           emit(const AuthErrorState("User registration failed."));
         }
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      logErrorToCrashlytics(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }
@@ -65,9 +49,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else if (_emailRules.hasMatch(event.email)) {
         final user =
             await fireBaseService.signInUser(event.email, event.password);
-        emit(AuthAuthenticated(user!));
+        if (user != null) {
+          await sQlService.saveToken(event.email);
+          emit(AuthAuthenticated(user));
+        }
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      logErrorToCrashlytics(e, s);
       emit(AuthErrorState(e.getErrorMessage()));
     }
   }

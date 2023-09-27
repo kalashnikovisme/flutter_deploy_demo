@@ -6,7 +6,6 @@ import 'package:test_intern/presentation/localization_bloc/localization_event.da
 import 'package:test_intern/presentation/localization_bloc/localization_state.dart';
 
 class LanguageSwitcher extends StatelessWidget {
-
   const LanguageSwitcher({super.key});
 
   @override

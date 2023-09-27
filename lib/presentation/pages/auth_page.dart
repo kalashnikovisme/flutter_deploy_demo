@@ -4,6 +4,7 @@ import 'package:test_intern/presentation/auth_bloc/auth_bloc.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_event.dart';
 import 'package:test_intern/presentation/auth_bloc/auth_state.dart';
 import 'package:test_intern/presentation/pages/home_page.dart';
+import 'package:test_intern/presentation/pages/widget/no_internet_widget.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -20,10 +21,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String passwordErrorText = '';
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Вход'),
+        title: Text(AppLocalizations.of(context)?.enter ?? ''),
+        actions: const [
+          NoInternetBanner(),
+        ],
       ),
       body: BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(),
@@ -43,8 +54,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          HomePage(email: state.user.email ?? ''),
+                      builder: (context) => HomePage(
+                        email: state.user.email ?? '',
+                      ),
                     ),
                     (route) => false,
                   );
@@ -69,7 +81,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   TextFormField(
                     controller: passwordController,
                     decoration: InputDecoration(
-                      labelText: 'Пароль',
+                      labelText:
+                          AppLocalizations.of(context)?.passwordString ?? '',
                       errorText: passwordErrorText.isNotEmpty
                           ? passwordErrorText
                           : null,
@@ -84,30 +97,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                RegisterEvent(
-                                  email: email,
-                                  password: password,
-                                ),
+                                RegisterEvent(email: email, password: password),
                               );
                         },
                         child: Text(
-                          AppLocalizations.of(context)?.registerString ?? '',
-                        ),
+                            AppLocalizations.of(context)?.registerString ?? ''),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           final email = emailController.text;
                           final password = passwordController.text;
                           context.read<AuthBloc>().add(
-                                SignInEvent(
-                                  email: email,
-                                  password: password,
-                                ),
+                                SignInEvent(email: email, password: password),
                               );
                         },
                         child: Text(
-                          AppLocalizations.of(context)?.signInString ?? '',
-                        ),
+                            AppLocalizations.of(context)?.signInString ?? ''),
                       ),
                     ],
                   ),
