@@ -7,7 +7,6 @@ import 'package:test_intern/presentation/home_bloc/home_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CachedDataIcon extends StatelessWidget {
-
   const CachedDataIcon({super.key});
 
   @override

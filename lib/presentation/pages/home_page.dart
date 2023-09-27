@@ -124,6 +124,17 @@ class _HomePageState extends State<HomePage> {
                                     resultModel: item,
                                   );
                                 }
+                                if (state.next?.isEmpty ?? false) {
+                                  return Center(
+                                    child: Text(
+                                      AppLocalizations.of(context)
+                                              ?.allDataLoadedString ??
+                                          '',
+                                      style: TextsStyles.allDataLoadedString,
+                                    ),
+                                  );
+                                }
+
                                 return const Center(
                                   child: CircularProgressIndicator(),
                                 );
