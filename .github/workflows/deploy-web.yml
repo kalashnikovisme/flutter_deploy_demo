@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       flavor:
-        description: "App Flavor: seller | driver"
+        description: "App Flavor: app_1 | app_2"
         required: true
       version:
         description: "New App Version: x.x.x"
