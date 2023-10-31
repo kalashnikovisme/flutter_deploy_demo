@@ -1,6 +1,9 @@
 name: 🌍🚀 Build & Deploy Flutter Web App
 
 on:
+  push:
+    branches:
+      main
   workflow_dispatch:
     inputs:
       environment:
