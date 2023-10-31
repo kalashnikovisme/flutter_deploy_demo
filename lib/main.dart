@@ -1,3 +1,3 @@
-import 'package:test_intern/runner.dart';
+import 'package:test_intern/src/runner.dart';
 
 void main() => runner(appName: 'Flutter Demo');
