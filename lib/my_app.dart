@@ -14,7 +14,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:test_intern/presentation/pages/enter_page.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key, required this.appName}) : super(key: key);
+
+  final String appName;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class MyApp extends StatelessWidget {
                 locale: Locale(state.locale.first.languageCode, state.locale.last.languageCode),
                 supportedLocales: L10N.supportedLanguage,
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
-                title: 'Flutter Demo',
+                title: appName,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                   useMaterial3: true,
