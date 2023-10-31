@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:test_intern/src/data/dtos/result.dart';
 import 'package:test_intern/src/data/mappers/rick_and_morty_mapper.dart';
 import 'package:test_intern/src/domain/models/result_model.dart';
@@ -22,9 +24,16 @@ class SQLService {
   }
 
   Future<Database> initDB() async {
-    final String dbPath = path.join(await getDatabasesPath(), "user_database.db");
-    final charDB = await openDatabase(dbPath, version: 6, onCreate: _createDB);
-    return charDB;
+    final String dbPath;
+    if (kIsWeb) {
+      databaseFactory = databaseFactoryFfiWeb;
+      dbPath = 'my_web_web.db';
+    } else {
+      dbPath = path.join(await getDatabasesPath(), "user_database.db");
+    }
+
+    final db = await openDatabase(dbPath, version: 6, onCreate: _createDB);
+    return db;
   }
 
   Future _createDB(Database db, int version) async {
