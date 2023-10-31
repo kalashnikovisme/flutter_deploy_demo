@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 
 const String emailAlreadyInUse = 'email-already-in-use';
 const String userNotFound = 'ERROR_USER_NOT_FOUND';
@@ -21,5 +22,7 @@ extension FirebaseAuthExceptionExtension on FirebaseAuthException {
 }
 
 void logErrorToCrashlytics(error, stackTrace) {
-  FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  if (!kIsWeb) {
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  }
 }
