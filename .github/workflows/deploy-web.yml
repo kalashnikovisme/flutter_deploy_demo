@@ -48,7 +48,7 @@ jobs:
         uses: ./.github/actions/configure-environment
 
       - name: 🌍 Build Web ${{ inputs.environment }}
-        run: flutter build web -t lib/app_1/main.dart --release
+        run: flutter build web -t lib/app_2/main.dart --release
         # run: flutter build web -t lib/app_1/main.dart --release --dart-define=CONFIG=${{ inputs.environment }}
 
       - name: Publish to Cloudflare
@@ -56,7 +56,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: mad-brains-1
+          projectName: mad-brains-2
           directory: build/web
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: main
