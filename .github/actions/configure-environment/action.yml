@@ -1,0 +1,24 @@
+name: '🛠️ Create .env and Setup'
+description: 'Creates .env and does some initial setup'
+runs:
+  using: "composite"
+  steps:
+    - name: 🔍 Create .env file
+      run: |
+        touch .env
+        for var in $(env)
+        do
+          if [[ $var == FA_* ]]; then
+            echo "$var" >> .env
+            echo "Variable added: ${var%%=*}"
+          fi
+        done
+      shell: bash
+
+    - name: 🤖 Install dependencies
+      run: flutter pub get
+      shell: bash
+
+    - name: 💬 Generate l10n
+      run: flutter gen-l10n --template-arb-file=app_ru.arb
+      shell: bash

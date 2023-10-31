@@ -1,0 +1,60 @@
+name: 🌍🚀 Build & Deploy Flutter Web App
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "App Environment: debug | release"
+        required: true
+        type: string
+      flavor:
+        description: "App Flavor: seller | driver"
+        required: true
+      version:
+        description: "New App Version: x.x.x"
+        required: true
+
+jobs:
+  buildWeb:
+    name: 🌍 Build Web ${{ inputs.environment }} for ${{ inputs.flavor }}
+    environment:
+      name: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 📝 Edit pubspec version
+        run: |
+          sed -Ei "s/^version: (.*)/version: ${{ inputs.version }}/" pubspec.yaml
+
+      - name: ⚙️ Setup Flutter
+        uses: subosito/flutter-action@v2
+
+      - name: ⚙️ Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.pub-cache
+            .flutter-plugins
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: 🛠️ Configure environment
+        uses: ./.github/actions/configure-environment
+
+      - name: 🌍 Build Web ${{ inputs.environment }}
+        run: flutter build web -t lib/app_1/main.dart --release
+        # run: flutter build web -t lib/app_1/main.dart --release --dart-define=CONFIG=${{ inputs.environment }}
+
+      - name: Publish to Cloudflare
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: mad-brains-1
+          directory: build/web
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
