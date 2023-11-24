@@ -27,22 +27,8 @@ jobs:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: 📝 Edit pubspec version
-        run: |
-          sed -Ei "s/^version: (.*)/version: ${{ inputs.version }}/" pubspec.yaml
-
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
-
-      - name: ⚙️ Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.pub-cache
-            .flutter-plugins
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-
 
       - name: 🛠️ Configure environment
         uses: ./.github/actions/configure-environment
